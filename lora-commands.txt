@@ -1,0 +1,51 @@
+help
+[0:00:01:11] GET (INFO|USERINFO|NWINFO) (FROM stn)
+      * get info
+        26973 Processing.... 7 7 1 15 TS 000108FE[00000000] 0
+        20 Processing.... 7 7 2 15 TS 00010912[000108FE] {"stationID":7,"model":"raw","build":"2.22","upTime":"0:00:01:07","power":"USB","repeat":"off","admin":"on","auto_reboot":"on","auto_update":"off","currentLimit":140,"powerLevel":22,"tempCelsius":86.7}
+        [0:00:01:07] Info from 7:{"stationID":7,"model":"raw","build":"2.22","upTime":"0:00:01:07","power":"USB","repeat":"off","admin":"on","auto_reboot":"on","auto_update":"off","currentLimit":140,"powerLevel":22,"tempCelsius":86.7}
+        33 Processing.... 7 7 15 15 TS 00010933[00010912] INFO_REPLY ACK.
+
+      * get userinfo
+        [0:00:02:39] Unrecognized command.
+        get userinfo from 7
+        87411 Processing.... 7 7 1 15 TS 000292C2[00000000] 6
+        4 Processing.... 7 7 2 15 TS 000292C6[000292C2] {"stationID":7,"timezone":"PST+8"}
+        [0:00:02:48] Info from 7:{"stationID":7,"timezone":"PST+8"}
+        12 Processing.... 7 7 15 15 TS 000292D3[000292C6] INFO_REPLY ACK.d
+
+      * get nwinfo from 7
+        92141 Processing.... 7 7 1 15 TS 0003FABF[00000000] 3
+        4 Processing.... 7 7 2 15 TS 0003FAC3[0003FABF] {"stationID":7,"network":1,"nw_version":"0.3","silenceTime":"0:00:04:20","ssid":"updater","wifi":"not connected","ssh_url":"switchboard.loraline.net","ssh_port":8022,"ssh":"not connected"}
+        [0:00:04:20] Info from 7:{"stationID":7,"network":1,"nw_version":"0.3","silenceTime":"0:00:04:20","ssid":"updater","wifi":"not connected","ssh_url":"switchboard.loraline.net","ssh_port":8022,"ssh":"not connected"}
+        33 Processing.... 7 7 15 15 TS 0003FAE4[0003FAC3] INFO_REPLY ACK.
+
+[0:00:01:11] GET ([NEW] MAP|ONLINE|DEBUG) (FROM stn)
+[0:00:01:11] GET LOG (FROM stn)
+[0:00:01:12] GET MORE LOG (FROM stn)
+[0:00:01:12] WRITE LOG (FROM stn)
+[0:00:01:12] ADD stn TO GROUP grp
+[0:00:01:12] REMOVE stn FROM GROUP grp
+[0:00:01:12] CLEAR GROUPS (ON stn)
+[0:00:01:12] GET GRPINFO (FROM stn)
+[0:00:01:12] GET WIFI (FROM stn)
+[0:00:01:12] SEND RU_ON TO (stn0|GROUP grp)
+[0:00:01:12] SEND TR TO stn
+[0:00:01:12] SEND RU_OK TO (stn0|GROUP grp)
+[0:00:01:12] SEND MSG nnn TO (stn0|GROUP grp) (  |ALARM|CRITICAL)
+[0:00:01:12] SEND TEXT "input string" TO (stn0|GROUP grp) (  |ALARM|CRITICAL)
+[0:00:01:12] SEND NAME "user friendly name" to stn
+[0:00:01:12] SEND TZ "localTimeZone" to stn
+[0:00:01:12] SEND ADDRESS "street address" to stn
+[0:00:01:12] SEND (REPEAT|BEEP|ADMIN|AUTO_REBOOT|AUTO_UPDATE) ON/OFF TO stn
+[0:00:01:12] SEND (POWER|CURRENT) level TO stn
+[0:00:01:12] SEND SSID "abcdef:password" TO stn
+[0:00:01:12] SEND SSH "URL:port" TO stn
+[0:00:01:12] CLEAR LOG (ON stn)
+[0:00:01:12] CLEAR MAP (ON stn)
+[0:00:01:12] CHANGE ID TO stn (ON stn)
+[0:00:01:12] REBOOT (stn)
+[0:00:01:12] UPDATE (ALL)
+[0:00:01:12] UPDATE v.vv
+[0:00:01:12] UPDATE stn0 (WITH v.vv)
+[0:00:01:12] CLONE stn
