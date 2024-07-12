@@ -1,4 +1,4 @@
 !.gitignore
 !cmds/
 !connections.py
-!tests
+!tests/
