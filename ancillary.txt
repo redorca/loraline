@@ -1,16 +1,3 @@
-: !git
-git remote -v
-origin	ssh://git@github.com/erdewit/ib_insync.git (fetch)
-origin	ssh://git@github.com/erdewit/ib_insync.git (push)
-[loraline]master@origin::rock@planet-claire:~/loraline/ib_insync/ib_insync
-:: pd +2
- 0  ~/loraline/eventkit
- 1  ~/loraline/ib_insync/ib_insync
- 2  ~/loraline/toy/src/python/streamer
-[loraline]master@origin::rock@planet-claire:~/loraline/eventkit
-:: !git
-git remote -v
-origin	ssh://git@github.com/erdewit/eventkit.git (fetch)
-origin	ssh://git@github.com/erdewit/eventkit.git (push)
-[loraline]master@origin::rock@planet-claire:~/loraline/eventkit
+git clone ssh://git@github.com/erdewit/ib_insync.git
+git clone ssh://git@github.com/erdewit/eventkit.git
 
