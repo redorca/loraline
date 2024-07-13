@@ -54,13 +54,12 @@ class Connection():
         self.state = 'open'
         return self.connection
 
-    async def make_channel(self):
+    async def make_channel(self, cmd):
         '''
             open a unique channel on the connection. Expect it to be unique across multiple
             calls so that parallel actions may be supported.
         '''
-        return
-        return await self.connection.open_connection(self.target, self.port)
+        return await self.connection.open_session(command=cmd)
 
     async def close_connection(self):
         if self.state is open:

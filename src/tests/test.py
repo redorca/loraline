@@ -15,8 +15,17 @@ async def roo():
     '''
         connect to the self identified host. An SSHClientConnection object is returned.
     '''
+    whole = str()
     client = await  frup()
     connection = await client.connect()
-    channel = await client.make_channel()
+    channelW, channelR, channelEr = await client.make_channel('ls -l')
+    # buff = await channelR.read(50)
+    buff = await channelR.readline()
+    while channelR.at_eof() is False:
+        whole += buff
+        buff = await channelR.readline()
+
+    whole += buff
+    print(f"read in {whole}")
 
 asyncio.run(roo())
