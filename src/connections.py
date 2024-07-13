@@ -21,19 +21,18 @@ class Connection():
         self.route['ssh'] = self.proto_ssh
         self.route['serial'] = self.proto_serial
 
-    def flub(self, proto_address):
+    def parse_addr(self, proto_address):
         '''
         '''
         roto_address = proto_address.split(':')
-        if roto_address[0] == 'serial':
-            proto_address = ':'.join(roto_address[1:])
+        proto_address = ':'.join(roto_address[1:])
         return proto_address, roto_address[0]
 
     async def connect(self):
         '''
         '''
-        conn_addr, proto = self.flub(self.address)
-        await self.route[proto](conn_addr)
+        conn_addr, proto = self.parse_addr(self.address)
+        return await self.route[proto](conn_addr)
 
     async def __serial_connect(self, addr):
         '''
@@ -43,6 +42,17 @@ class Connection():
 
     async def __ssh_connect(self, addr):
         '''
+            Run an ssh connection agent and return the connection. An SSHClientConnection object
+            is returned against which sessions may be created or opened
         '''
-        print(f'ssh address {addr}')
-        return
+        parts = addr.split(':')
+        creds = parts[1].split(',')
+        print(f'{parts[0]} username={creds[0]}, password={creds[1]}')
+        self.connection = await asyncssh.connect(parts[0], username=creds[0], password=creds[1])
+        self.state = 'open'
+        return self.connection
+
+    async def close_connection(self):
+        if self.state is open:
+            await  self.connection.wait_closed()
+            return
