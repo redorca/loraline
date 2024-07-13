@@ -15,7 +15,8 @@ async def roo():
     '''
         connect to the self identified host. An SSHClientConnection object is returned.
     '''
-    connection = await  frup()
-    channel = await connection.connect()
+    client = await  frup()
+    connection = await client.connect()
+    channel = await client.make_channel()
 
 asyncio.run(roo())

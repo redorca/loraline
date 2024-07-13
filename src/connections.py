@@ -28,17 +28,12 @@ class Connection():
         self.protocol = roto_address[0]
         self.address = ':'.join(roto_address[1:])[2:]
         print(f'self.address {self.address}')
-        # self.port = roto_address[2].split(',')[0]
-        # self.username = roto_address[2].split(',')[1]
-        # self.password = roto_address[2].split(',')[2]
         return self.address, self.protocol
 
     async def connect(self):
         '''
         '''
         conn_addr, proto = self.parse_addr()
-        print(f'conn_addr {conn_addr}')
-        return
         return await self.route[proto](conn_addr)
 
     async def __serial_connect(self, addr):
@@ -52,10 +47,12 @@ class Connection():
             Run an ssh connection agent and return the connection. An SSHClientConnection object
             is returned against which sessions may be created or opened
         '''
-        parts = addr.split(':')
-        creds = parts[1].split(',')
-        print(f'{parts[0]} username={creds[0]}, password={creds[1]}')
-        self.connection = await asyncssh.connect(self.address, username=self.username, password=self.password)
+        self.target = addr.split(':')[0]
+        self.port = addr.split(':')[1].split(',')[0]
+        self.username = addr.split(':')[1].split(',')[1]
+        self.password = addr.split(':')[1].split(',')[2]
+        return
+        self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
         self.state = 'open'
         return self.connection
 
