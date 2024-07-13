@@ -14,7 +14,6 @@ class Connection():
         '''
         '''
         self.uri = uri
-        self.connection = ''
         self.proto_serial = self.__serial_connect
         self.proto_ssh = self.__ssh_connect
         self.route = dict()
@@ -48,10 +47,9 @@ class Connection():
             is returned against which sessions may be created or opened
         '''
         self.target = addr.split(':')[0]
-        self.port = addr.split(':')[1].split(',')[0]
+        self.port = int(addr.split(':')[1].split(',')[0])
         self.username = addr.split(':')[1].split(',')[1]
         self.password = addr.split(':')[1].split(',')[2]
-        return
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
         self.state = 'open'
         return self.connection
@@ -61,7 +59,8 @@ class Connection():
             open a unique channel on the connection. Expect it to be unique across multiple
             calls so that parallel actions may be supported.
         '''
-        return await self.connection.open_connection(self.addr, self.port)
+        return
+        return await self.connection.open_connection(self.target, self.port)
 
     async def close_connection(self):
         if self.state is open:
