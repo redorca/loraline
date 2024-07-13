@@ -4,28 +4,34 @@
 import asyncio
 import connections as conn
 
-async def frup():
+async def connect():
     '''
+        Establish an authenticated connection for later use.
+        Returns an SSHClient object from asyncssh
     '''
     foo = conn.Connection('ssh://localhost:22,wings,Venus&Mars')
-    # foo = conn.Connection('serial:/dev/ttyS0')
-    return foo
+    connection = await foo.connect()
+    return foo, connection
 
-async def roo():
+async def boo(client, cmd):
     '''
-        connect to the self identified host. An SSHClientConnection object is returned.
+        Open a channel to the self identified host. An SSHClientConnection object is returned.
     '''
     whole = str()
-    client = await  frup()
-    connection = await client.connect()
-    channelW, channelR, channelEr = await client.make_channel('ls -l')
-    # buff = await channelR.read(50)
+    channelW, channelR, channelEr = await client.make_channel(cmd)
     buff = await channelR.readline()
     while channelR.at_eof() is False:
         whole += buff
         buff = await channelR.readline()
 
     whole += buff
-    print(f"read in {whole}")
+    return whole
 
-asyncio.run(roo())
+async def main():
+    client, connection = await connect()
+    cmd = ['ls -l', 'find Documents']
+    for entry in cmd:
+        results = await client.issue(entry)
+        print(f'{results}')
+
+asyncio.run(main())
