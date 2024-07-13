@@ -7,7 +7,7 @@ import connections as conn
 async def frup():
     '''
     '''
-    foo = conn.Connection('ssh:localhost:wings,Venus&Mars')
+    foo = conn.Connection('ssh://localhost:22,wings,Venus&Mars')
     # foo = conn.Connection('serial:/dev/ttyS0')
     return foo
 
