@@ -11,10 +11,11 @@ def main():
     '''
         Read in config file.
     '''
-    configs = parse.ConfigParser(delimeters=('=', ':', ',', ' '))
+    configs = parse.ConfigParser(allow_no_value=True)
     foo = configs.read('/etc/loraline/netmanage.conf')
-    print(f'sections {configs.sections()}')
-
+    print(f'sections {configs.sections()} {configs.items("lora")}')
+    for sect in configs.sections():
+        print(f'items in {sect} : {configs.items(sect)}')
 
 
 
