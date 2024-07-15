@@ -64,8 +64,6 @@ clean:
 	$(Q) $(RM) -r $(DESTDIR)
 
 clobber: clean
-	# $(Q) $(RM) -r ${DESTDIR%debian*}debian/{debhelper-build-stamp,gcc-arm-none-eabi.substvars,files,.debhelper}
 	$(Q) cd ${DESTDIR%debian*}debian/ && $(RM) -r debhelper-build-stamp gcc-arm-none-eabi.substvars files .debhelper
-	$(Q)
 
 
