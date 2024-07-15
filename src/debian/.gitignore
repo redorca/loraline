@@ -4,3 +4,7 @@
 !control
 !copyright
 !Makefile.loraline-netmanage
+!Makefile
+!rules
+!newracom-evk.postinst
+!newracom-evk.prerm
