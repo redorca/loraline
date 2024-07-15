@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
 
-PACKAGE = newracom-evk
-VERSION = 1.5.nrc7292
+PACKAGE = loranet-netmanage
+VERSION = 1.1-1
 BUILD_DIR=${PACKAGE}-${VERSION}
-SERVICES = newracom.servvice
+SERVICES = netmanage.servvice
 RM = rm -f
 clean:
 	@dh_clean
