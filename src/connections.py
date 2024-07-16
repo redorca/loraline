@@ -71,6 +71,16 @@ class Connection():
             whole += buff
             return whole
 
+    async def run(self):
+        while True:
+            while len(que) == 0:
+                asycio.sleep(0)
+            do_it = que_popleft()
+            print(f'results for {do_it}')
+            continue
+            results = await issue(do_it)
+            return_q.append(results)
+            asyncio.sleep(0)
 
     async def close_connection(self):
         if self.state is open:

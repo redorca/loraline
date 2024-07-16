@@ -29,12 +29,15 @@ def client(host, address, port, cmd):
         print(f'returned data {data}')
 
 async def main():
-    if len(sys.argv) > 1 and not sys.argv[1] in cmds.commands.lora_cmds:
+    if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
         print(f"This command '{sys.argv[1]}' is unrecognized.")
+        return
+    if len(sys.argv) > 2 and not sys.argv[2] in commands.lora_cmds[sys.argv[1]]:
+        print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
         return
     cmd_string = ' '.join(sys.argv[1:])
     print(f'cmd string:: {cmd_string}')
     host, address, port = await initialize.set_params()
-    client(host, address, port, bytes(cmd_string.encode('UTF8')))
+    # client(host, address, port, bytes(cmd_string.encode('UTF8')))
 
 asyncio.run(main())
