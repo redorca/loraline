@@ -8,6 +8,7 @@ import platform
 import configparser as parse
 import initialize
 
+
 async def do_cmd(StreamReader, StreamWriter):
     '''
         Wait for input in preparation for queueing a command that
@@ -15,8 +16,10 @@ async def do_cmd(StreamReader, StreamWriter):
     '''
     print(f'=======')
     data = await StreamReader.read(300)
-    print(f'received {data}')
+    process_q.append(str(data))
+    print(f'received {data} queue {process_q}')
     StreamWriter.write(b'done')
+
 
 async def main():
     '''
@@ -27,5 +30,7 @@ async def main():
     async with  server:
         await server.serve_forever()
 
-asyncio.run( main())
+
+process_q = deque()
+asyncio.run(main())
 

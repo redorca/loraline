@@ -10,8 +10,10 @@
 '''
 
 import initialize
+import cmds.commands
 import socket
 import asyncio
+import sys
 
 def client(host, address, port, cmd):
     '''
@@ -27,7 +29,12 @@ def client(host, address, port, cmd):
         print(f'returned data {data}')
 
 async def main():
+    if len(sys.argv) > 1 and not sys.argv[1] in cmds.commands.lora_cmds:
+        print(f"This command '{sys.argv[1]}' is unrecognized.")
+        return
+    cmd_string = ' '.join(sys.argv[1:])
+    print(f'cmd string:: {cmd_string}')
     host, address, port = await initialize.set_params()
-    client(host, address, port, b"ls -l")
+    client(host, address, port, bytes(cmd_string.encode('UTF8')))
 
 asyncio.run(main())
