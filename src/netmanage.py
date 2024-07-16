@@ -10,7 +10,7 @@
 '''
 
 import initialize
-import cmds.commands
+from cmds   import commands
 import socket
 import asyncio
 import sys
