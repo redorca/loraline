@@ -6,17 +6,26 @@ import asyncio
 from collections import deque
 import platform
 import configparser as parse
+import initialize
 
-Config_file = "/etc/loraline/netmanage.conf"
-def main():
+async def do_cmd(StreamReader, StreamWriter):
+    '''
+        Wait for input in preparation for queueing a command that
+        a command pipe will process.
+    '''
+    print(f'=======')
+    data = await StreamReader.read(300)
+    print(f'received {data}')
+    StreamWriter.write(b'done')
+
+async def main():
     '''
         Read in config file.
     '''
-    configs = parse.ConfigParser(allow_no_value=True)
-    foo = configs.read(Config_file)
-    listen_address = '127.0.0.1'
-    listen_port = configs["network"]["cli_socket"]
-    ssh_server = configs["network"]["ssh_host"]
+    host, addr, port = await initialize.set_params()
+    server = await asyncio.start_server(do_cmd, addr, port)
+    async with  server:
+        await server.serve_forever()
 
-main()
+asyncio.run( main())
 

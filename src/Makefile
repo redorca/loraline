@@ -8,6 +8,7 @@ BUILDDIR =  ${PACKAGE}_${VERSION}
 CONFIGDIR = etc/loraline/
 SYSTEMDIR = lib/systemd/system/
 UNITFILES = ${PACKAGE}.service ${PACKAGE}.socket
+CONFFILE  = netmanage.conf
 
 ${SYSTEMDIR} ${CONFIGDIR}:
 	@${MKDIR} $@
@@ -17,4 +18,7 @@ systemd: ${SYSTEMDIR}
 
 config: ${CONFIGDIR}
 	@cp etc/loraline/netmanage.conf debian/
+
+rooted: ${CONFIGDIR:%=/%}
+	@sudo cp ${CONFIGDIR}/${CONFFILE} $^
 
