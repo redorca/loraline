@@ -57,23 +57,20 @@ class Connection():
     async def issue(self, cmd):
         '''
             run a command on the host of this channel and return the results in string form. 
-        '''
-        whole = str()
-        channelW, channelR, channelEr = await self.make_channel(cmd)
-        buff = await channelR.readline()
-        while channelR.at_eof() is False:
-            whole += buff
-            buff = await channelR.readline()
-
-        whole += buff
-        return whole
-
-    async def make_channel(self, cmd):
-        '''
             open a unique channel on the connection. Expect it to be unique across multiple
             calls so that parallel actions may be supported.
         '''
-        return await self.connection.open_session(command=cmd)
+        whole = str()
+        channelW, channelR, channelEr = await self.connection.open_session(command=cmd)
+        async with channelR:
+            buff = await channelR.readline()
+            while channelR.at_eof() is False:
+                whole += buff
+                buff = await channelR.readline()
+
+            whole += buff
+            return whole
+
 
     async def close_connection(self):
         if self.state is open:

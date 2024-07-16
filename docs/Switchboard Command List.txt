@@ -1,0 +1,20 @@
+Administrator commands (all prefixed with #)
+
+Valid admin commands:
+#list        (responds with a linear sorted list of stnIDs that are connected.)
+#nnn      (following non-# lines will be sent to stn nnn, the "default". may respond "nnn not connected". Input prompt becomes "nnn>"
+#nnn xxxx     xxxx is sent to stn nnn. May respond with "nnn not connected"
+#last		displays the previous 10 lines sent by the current default console
+#end        resets the default connection to <none>.
+#close nnn	close the SSH connection to stn nnn
+#exit 
+
+Send to default console:
+xxxxx (non-#) xxxx is sent to stn nnn. May respond with "Default target nnot set"
+
+Startup:
+set epoch tttttt    is sent after any new console connection (not a # command)
+
+Running under Linux:
+use sudo journalctl -u switchboard -f
+to see print output

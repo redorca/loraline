@@ -27,7 +27,7 @@ async def main():
     '''
     host, addr, port = await initialize.set_params()
     server = await asyncio.start_server(do_cmd, addr, port)
-    async with  server:
+    async with server:
         await server.serve_forever()
 
 

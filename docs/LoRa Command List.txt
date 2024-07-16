@@ -1,0 +1,60 @@
+Forms of test input
+
+GET (INFO|MAP|ONLINE|NWINFO|DEBUG|USERINFO|NEW MAP|GRPINFO)	
+	sends OPCODE_INFO 0|1|2|3|4|5|6|7|8
+	returns local info
+	(info == Vmaj.min, timeup (hh:mm), bat=nn.nnV, currentLimit, ...)
+	(map == db1#nbr1, db2!nbr2, etc...)
+GET (INFO|MAP|ONLINE|NWINFO|DEBUG|ID|USERINFO|NEW MAP) FROM stn	as above
+GET LOG	(FROM stn)		returns most recent 9 log entries
+GET MORE LOG (FROM stn)		returns next 10 log entries
+WRITE LOG (FROM stn)		uploads entire log to SSH server
+GET WIFI (FROM stn)		returns nearby SSIDs, along with their RSSI and channel #
+SEND RU_ON TO (stn0|GROUP grp)	reply is IM_ON dbi@stn
+	send RU_ON "0"
+SEND TR TO stn			reply is IM_ON 	db1#nbr1, db2!nbr2, etc... via add_tr flag
+	send RU_ON "1"
+SEND RU_OK TO (stn0|GROUP grp)	
+	send RU_OK		reply IM_OK  "0" or "1" depending on button pressed
+SEND MSG nnn TO (stn0|GROUP grp)		send MSG "nn,0"
+	no alarm
+SEND MSG nn TO (stn0|GROUP grp) ALARM		send MSG "nn,1"
+	alarm stops after xxx seconds
+SEND MSG nn TO (stn0|GROUP grp) CRITICAL	send MSG "nn,2"
+	alarm stops after button press
+	can SEND MSG or SEND MESSAGE
+SEND TEXT "input string" TO (stn0|GROUP grp) <level>	send TEXT_MSG "input string",level
+	<level> = empty|ALARM|CRITICAL  append 0|1|2
+SEND NAME "user friendly name" to stn   sets username on stn
+SEND ADDRESS "street address" to stn	sets useraddress on stn
+SEND TZ "localTImeZone" to stn   		sets localTimeZone on stn
+SEND params					send param#,level
+	SEND (REPEAT|BEEP|ADMIN|AUTO_REBOOT|AUTO_UPDATE) ON/OFF TO stn
+						'0' for off, '1' for on
+	SEND (POWER|CURRENT) level TO stn
+	SEND SSID "abcdef:password" TO stn	 sets WiFi SSID & passsword on stn
+	SEND SSH "URL:port" TO stn	changes where to connect for SSH
+CLEAR LOG (ON stn)			empty the log file (on station stn)
+CLEAR GROUPS (ON stn)			remove all groups (on station stn)
+CHANGE ID TO stn <ON m>	changes stationID to stn <on station m> (clears GROUPS)
+ADD stn TO GROUP grp			add a station to a group
+REMOVE stn FROM GROUP grp		remove a station from a group
+REBOOT stn				send REBOOT to stn
+REBOOT					REBOOT this stn
+CLEAR MAP (ON stn)			resets RSSI and SNR packet histories
+UPDATE ALL				update all (incl. self) to latest firmware
+UPDATE n.m				update this stn to version n.m
+UPDATE stn0 (WITH n.m)			updates stn to latest version or version n.m
+CLONE stn				repeater sends its current firmware to its neighbors
+SET EPOCH ttttt				sets the local time using UNIX epoch value
+EXIT					ends command input on Serial port
+
+stn == one of 1....255
+stn0 is one of 0...255
+grp == one of 1....255
+
+Sending of REPEAT|BEEP|ADMIN|POWER|CURRENT|SSID|SSH|CLEAR, etc. restricted to ADMINs.
+ADD, REMOVE, CLEAR GROUPs restricted to ADMINs.
+Only UPDATE, SEND MSG, SEND TEXT, RU_ON and RU_OK may be broadcast.
+SEND MSG and SEND TEXT replies only if sent to a Group.
+(System may broadcast RAW TEXT, REBOOTED, IM_ON packets as well.)
