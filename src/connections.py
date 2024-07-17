@@ -76,7 +76,7 @@ class Connection():
             while len(que) == 0:
                 asycio.sleep(0)
             do_it = que_popleft()
-            print(f'results for {do_it}')
+            print(f'run command {do_it}')
             continue
             results = await issue(do_it)
             return_q.append(results)

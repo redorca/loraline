@@ -32,7 +32,6 @@ class Network():
     def __populate__(self):
         for entry in self.__get_config__():
             self.network[entry.split(':')[0]] = list(entry.split(':')[1:])
-        # frump = [ x.split(":")[0]  for x in self.__get_config__()]
         return self.network
 
     def dump_entries(self):
