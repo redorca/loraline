@@ -18,40 +18,40 @@ class DasLog():
         self.map_to_level = dict()
 
         self.handlers['syslog'] = lhaul.SysLogHandler
-        sysHandle = self.handlers['syslog']()
+        sysHandle = self.handlers['syslog'](address='/dev/log')
 
         '''
             This order of mapping to levels is the priority/order within the logging module too.
         '''
-        self.map_to_level['debug'] =    lhaul.DEBUG
-        self.map_to_level['info'] =     lhaul.INFO
-        self.map_to_level['warn'] =     lhaul.WARNING
-        self.map_to_level['error'] =    lhaul.ERROR
-        self.map_to_level['critical'] = lhaul.CRITICAL
+        self.map_to_level['debug'] =    logging.DEBUG
+        self.map_to_level['info'] =     logging.INFO
+        self.map_to_level['warn'] =     logging.WARNING
+        self.map_to_level['error'] =    logging.ERROR
+        self.map_to_level['critical'] = logging.CRITICAL
 
         self.log = logging.getLogger(__name__)
-        self.log.setLevel(logging.info)
+        self.log.setLevel(logging.INFO)
         self.log.addHandler(sysHandle)
 
         return
 
     def error(self, msg):
-        self.logger.error(msg)
+        self.log.error(msg)
 
     def info(self, msg):
-        self.logger.info(msg)
+        self.log.info(msg)
 
     def warn(self, msg):
         self.warning(msg)
 
     def warning(self, msg):
-        self.logger.warning(msg)
+        self.log.warning(msg)
 
     def debug(self, msg):
-        self.logger.debug(msg)
+        self.log.debug(msg)
 
     def critical(self, msg):
-        self.logger.critical(msg)
+        self.log.critical(msg)
 
     def msg(self, level, msg):
         self.map_to_level[level](msg)

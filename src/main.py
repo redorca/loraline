@@ -2,6 +2,7 @@
     Create tasks including a listener socket for receiving cmds from the CLI
 '''
 
+from loglady import logg
 import asyncio
 from collections import deque
 import platform
@@ -9,15 +10,17 @@ import configparser as parse
 import initialize
 
 
+blog = logg.DasLog()
 async def do_cmd(StreamReader, StreamWriter):
     '''
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
-    print(f'=======')
+    print('=======')
+    blog.info('=======')
     data = await StreamReader.read(300)
     process_q.append(str(data))
-    print(f'received {data} queue {process_q}')
+    blog.info(f'received {data} queue {process_q}')
     StreamWriter.write(b'done')
 
 

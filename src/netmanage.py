@@ -9,6 +9,7 @@
 '''
 '''
 
+from loglady import logg
 import initialize
 from cmds   import commands
 import socket
@@ -38,6 +39,6 @@ async def main():
     cmd_string = ' '.join(sys.argv[1:])
     print(f'cmd string:: {cmd_string}')
     host, address, port = await initialize.set_params()
-    # client(host, address, port, bytes(cmd_string.encode('UTF8')))
+    client(host, address, port, bytes(cmd_string.encode('UTF8')))
 
 asyncio.run(main())
