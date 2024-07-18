@@ -62,14 +62,13 @@ class Connection():
         '''
         whole = str()
         channelW, channelR, channelEr = await self.connection.open_session(command=cmd)
-        async with channelR:
-            buff = await channelR.readline()
-            while channelR.at_eof() is False:
-                whole += buff
-                buff = await channelR.readline()
-
+        buff = await channelR.readline()
+        while channelR.at_eof() is False:
             whole += buff
-            return whole
+            buff = await channelR.readline()
+
+        whole += buff
+        return whole
 
     async def run(self):
         while True:
