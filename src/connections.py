@@ -3,6 +3,11 @@
 '''
 
 import asyncio, asyncssh, sys
+from collections import deque
+from loglady import logg
+
+xlog = logg.DasLog()
+results_q = deque()
 
 class Connection():
     '''
@@ -20,25 +25,35 @@ class Connection():
         self.route['ssh'] = self.proto_ssh
         self.route['serial'] = self.proto_serial
 
+        xlog.info(f'== URI {self.uri}')
+
     def parse_addr(self):
         '''
         '''
         roto_address = self.uri.split(':')
+        if len(roto_address) != 3:
+            xlog.error(f"wrong # of components in address {roto_address}")
+            return None, None
+
+        xlog.info(f'== roto_address {roto_address}')
         self.protocol = roto_address[0]
+        # Strip off the leading '//'
         self.address = ':'.join(roto_address[1:])[2:]
-        print(f'self.address {self.address}')
         return self.address, self.protocol
 
     async def connect(self):
         '''
         '''
         conn_addr, proto = self.parse_addr()
+        if proto == None:
+            return False
+
         return await self.route[proto](conn_addr)
 
     async def __serial_connect(self, addr):
         '''
         '''
-        print(f'serial address {addr}')
+        xlog.info(f'serial address {addr}')
         return
 
     async def __ssh_connect(self, addr):
@@ -47,9 +62,10 @@ class Connection():
             is returned against which sessions may be created or opened
         '''
         self.target = addr.split(':')[0]
-        self.port = int(addr.split(':')[1].split(',')[0])
-        self.username = addr.split(':')[1].split(',')[1]
-        self.password = addr.split(':')[1].split(',')[2]
+        self.protocol = "ssh"
+        self.port = int(addr.split(':')[1].split(':')[1])
+        self.username = addr.split(':')[1].split(',')[0]
+        self.password = addr.split(':')[1].split(',')[1]
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
         self.state = 'open'
         return self.connection
@@ -68,14 +84,15 @@ class Connection():
             buff = await channelR.readline()
 
         whole += buff
-        return whole
+        results_q.append(whole)
+        return
 
     async def run(self):
         while True:
-            while len(que) == 0:
-                asycio.sleep(0)
+            while len(results_q) == 0:
+                await asyncio.sleep(1)
             do_it = que_popleft()
-            print(f'run command {do_it}')
+            xlog.info(f'run command {do_it}')
             continue
             results = await issue(do_it)
             return_q.append(results)

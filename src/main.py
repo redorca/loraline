@@ -32,10 +32,12 @@ async def service(addr, port):
     return
 
 async def run_tasks(ahost, aport):
+    remote = conn.Connection("ssh://127.0.0.1:22:rock,Venus&Mars")
+    await remote.connect()
     blog.info(f'running tasks on {ahost} and port {aport}')
     async with asyncio.TaskGroup() as tg:
         tg.create_task(service(ahost, aport))
-
+        tg.create_task(remote.run())
 
     return
 
