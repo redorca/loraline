@@ -53,6 +53,9 @@ class DasLog():
     def critical(self, msg):
         self.log.critical(msg)
 
+    def get_level(self):
+        return logging.getLevelName(self.log.getEffectiveLevel())
+
     def msg(self, level, msg):
         self.map_to_level[level](msg)
 
