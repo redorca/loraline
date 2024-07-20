@@ -33,6 +33,8 @@ def client(host, port, cmd):
         blog.info(f'returned data {data}')
 
 async def main():
+    # connect_type = 'remote'
+    connect_type = 'local'
     if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
         print(f"This command '{sys.argv[1]}' is unrecognized.")
         return
@@ -40,10 +42,11 @@ async def main():
         print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
         return
     cmd_string = ' '.join(sys.argv[1:])
-    # blog.info(f'cmd string:: {cmd_string}')
     print(f'cmd string:: {cmd_string}')
-    host, port = await initialize.get_params('local')
-    # client(host, port, bytes(cmd_string.encode('UTF8')))
-    client(host, port, bytes('ls -l'.encode('UTF8')))
+    host, port = await initialize.get_params(connect_type)
+    if connect_type is "remote":
+        client(host, port, bytes(cmd_string.encode('UTF8')))
+    else:
+        client(host, port, bytes('ls -l'.encode('UTF8')))
 
 asyncio.run(main())
