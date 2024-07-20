@@ -11,18 +11,20 @@ import configparser as parse
 import initialize
 
 
-blog = logg.DasLog()
-blog.info(f'blogging level is {blog.get_level()}')
+# blog = logg.DasLog()
+# blog.info(f'blogging level is {blog.get_level()}')
+process_q = deque()
+results_q = deque()
 
 async def do_cmd(StreamReader, StreamWriter):
     '''
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
-    blog.info('=======')
+    print('=======')
     data = await StreamReader.read(300)
     process_q.append(str(data))
-    blog.info(f'received {data} queue {process_q}')
+    print(f'received {data} queue {process_q}')
     StreamWriter.write(b'done')
 
 async def service(addr, port):
@@ -31,29 +33,32 @@ async def service(addr, port):
         await server.serve_forever()
     return
 
-async def run_tasks(ahost, aport):
-    remote = conn.Connection("ssh://127.0.0.1:22:rock,Venus&Mars")
-    await remote.connect()
-    blog.info(f'running tasks on {ahost} and port {aport}')
+async def run_tasks(ahost, aport, q_cmds, q_returns, connxion):
+    print(f'running tasks on {ahost} and port {aport}')
     async with asyncio.TaskGroup() as tg:
+        # Create the local cli listener
         tg.create_task(service(ahost, aport))
-        tg.create_task(remote.run())
+        tg.create_task(bouy())
+        # Create the ssh command pipes
+        tg.create_task(connxion.run(q_cmds, q_returns))
+        # tg.create_task(connxion.run(process_q))
+        # tg.create_task(connxion.run(process_q))
 
     return
+
+async def bouy():
+    while True:
+        await asyncio.sleep(5)
+        print(",,,,,,")
 
 async def main():
     '''
         Read in config file.
     '''
-    host, addr, port = await initialize.set_params()
-    await run_tasks(addr, port)
+    host, port = await initialize.get_params('local')
+    remote = conn.Connection("ssh://127.0.0.1:22:rock,Venus&Mars")
+    await remote.connect()
+    await run_tasks(host, port, process_q, results_q, remote)
 
-process_q = deque()
 asyncio.run(main())
-
-#       client, connection = await connect(host)
-
-#       cmd = ['ls -l', 'find Documents']
-#       for entry in cmd:
-#           results = await client.issue(entry)
-#           print(f'{results}')
+# async def run_tasks(ahost, aport, passw='Venus&Mars', uname='rock'):

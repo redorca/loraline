@@ -4,10 +4,6 @@
 
 import asyncio, asyncssh, sys
 from collections import deque
-from loglady import logg
-
-xlog = logg.DasLog()
-results_q = deque()
 
 class Connection():
     '''
@@ -25,17 +21,14 @@ class Connection():
         self.route['ssh'] = self.proto_ssh
         self.route['serial'] = self.proto_serial
 
-        xlog.info(f'== URI {self.uri}')
 
     def parse_addr(self):
         '''
         '''
         roto_address = self.uri.split(':')
         if len(roto_address) != 3:
-            xlog.error(f"wrong # of components in address {roto_address}")
             return None, None
 
-        xlog.info(f'== roto_address {roto_address}')
         self.protocol = roto_address[0]
         # Strip off the leading '//'
         self.address = ':'.join(roto_address[1:])[2:]
@@ -53,7 +46,6 @@ class Connection():
     async def __serial_connect(self, addr):
         '''
         '''
-        xlog.info(f'serial address {addr}')
         return
 
     async def __ssh_connect(self, addr):
@@ -84,19 +76,24 @@ class Connection():
             buff = await channelR.readline()
 
         whole += buff
-        results_q.append(whole)
-        return
+        return whole
 
-    async def run(self):
+    async def run(self, cmds_q, results_q):
         while True:
-            while len(results_q) == 0:
-                await asyncio.sleep(1)
-            do_it = que_popleft()
-            xlog.info(f'run command {do_it}')
-            continue
-            results = await issue(do_it)
-            return_q.append(results)
-            asyncio.sleep(0)
+            while len(cmds_q) == 0:
+                await asyncio.sleep(2)
+            do_it = cmds_q.popleft()
+            # whole = str()
+            channelW, channelR, channelEr = self.connection.open_session(command=cmd)
+            # returned = await self.issue(self, do_it)
+            buff = await channelR.readline()
+            print('=1')
+            while channelR.at_eof() is False:
+                # whole += buff
+                buff += await channelR.readline()
+            # whole += buff
+            # results_q.append(whole)
+            results_q.append(buff)
 
     async def close_connection(self):
         if self.state is open:

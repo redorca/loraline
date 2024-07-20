@@ -12,16 +12,25 @@ import asyncio
 import configparser as parse
 
 Config_file = "/etc/loraline/netmanage.conf"
-async def set_params():
+
+async def get_params(func):
     '''
-        Read in config file.
+        Read in config file. Choose the set of parameters to use based on
+        the location of the listener. A remote listener would use ssh_xxx
+        and a local listener would be a client hence cli_xxx
     '''
+    key_host = "cli_host"
+    key_socket = "cli_socket"
+
+    if func == "remote":
+        key_host = "ssh_host"
+        key_socket = "ssh_socket"
+
     configs = parse.ConfigParser(allow_no_value=True)
     foo = configs.read(Config_file)
-    listen_address = '127.0.0.1'
-    listen_port = configs["network"]["cli_socket"]
-    ssh_server = configs["network"]["ssh_host"]
+    listen_port = configs["network"][key_socket]
+    listen_system = configs["network"][key_host]
 
-    return ssh_server, listen_address, listen_port
+    return listen_system, listen_port
 
 
