@@ -9,7 +9,7 @@ class Connection():
     '''
         Address is of the form <protocol>://<path to endpoint>[:<port to use>][<,user,password>]
         so a serial connection would be serial:///dev/ttySx and an ssh connection
-        would be ssh:<URI>:user:password
+        would be ssh:<URI>:port,user,password
     '''
     def __init__(self, uri):
         '''
@@ -21,13 +21,13 @@ class Connection():
         self.route['ssh'] = self.proto_ssh
         self.route['serial'] = self.proto_serial
 
-
     def parse_addr(self):
         '''
         '''
         roto_address = self.uri.split(':')
         if len(roto_address) != 3:
-            return None, None
+            print(f'bad address provided: {roto_address}, {self.uri}. Expected a split of 3 for ":"')
+            exit(1)
 
         self.protocol = roto_address[0]
         # Strip off the leading '//'
@@ -53,11 +53,16 @@ class Connection():
             Run an ssh connection agent and return the connection. An SSHClientConnection object
             is returned against which sessions may be created or opened
         '''
+
+        if len(addr.split(':')) != 2:
+            print(f'=== bad address provided: {addr}')
+            exit(1)
+
         self.target = addr.split(':')[0]
         self.protocol = "ssh"
-        self.port = int(addr.split(':')[1].split(':')[1])
-        self.username = addr.split(':')[1].split(',')[0]
-        self.password = addr.split(':')[1].split(',')[1]
+        self.port = int(addr.split(':')[1].split(',')[0])
+        self.username = addr.split(':')[1].split(',')[1]
+        self.password = addr.split(':')[1].split(',')[2]
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
         self.state = 'open'
         return self.connection
@@ -94,6 +99,14 @@ class Connection():
             # whole += buff
             # results_q.append(whole)
             results_q.append(buff)
+            await self.close_connection()
+
+    async def make_channel(self, cmd):
+        '''
+            open a unique channel on the connection. Expect it to be unique across multiple
+            calls so that parallel actions may be supported.
+        '''
+        return await self.connection.open_session(command=cmd)
 
     async def close_connection(self):
         if self.state is open:

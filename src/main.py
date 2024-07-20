@@ -56,7 +56,8 @@ async def main():
         Read in config file.
     '''
     host, port = await initialize.get_params('local')
-    remote = conn.Connection("ssh://127.0.0.1:22:rock,Venus&Mars")
+    # remote = conn.Connection("ssh://127.0.0.1:22:rock,Venus&Mars")
+    remote = conn.Connection("ssh://localhost:22,rock,lobster")
     await remote.connect()
     await run_tasks(host, port, process_q, results_q, remote)
 

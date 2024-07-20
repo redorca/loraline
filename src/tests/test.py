@@ -5,15 +5,13 @@ import asyncio
 import connections as conn
 import initialize
 
-async def connect(host):
+async def connect():
     '''
         Establish an authenticated connection for later use.
         Returns an SSHClient object from asyncssh
     '''
     # foo = conn.Connection('ssh://localhost:22,wings,Venus&Mars')
-    target = ''.join(['ssh://', host, ':22,wings,Venus&Mars'])
-    print(f'set target: {target}')
-    foo = conn.Connection(target)
+    foo = conn.Connection('ssh://localhost:22,rock,lobster')
     connection = await foo.connect()
     return foo, connection
 
@@ -33,8 +31,11 @@ async def boo(client, cmd):
 
 if __name__ == "__main__":
     async def main():
-        host, addr, port = await initialize.set_params()
-        client, connection = await connect(host)
+        # host, port = await initialize.get_params('local')
+        client, connection = await connect()
+        if type(client) is None:
+            print(f'error error error: No connection made.')
+            exit(1)
         cmd = ['ls -l', 'find Documents']
         for entry in cmd:
             results = await client.issue(entry)
