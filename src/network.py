@@ -42,7 +42,6 @@ class Network():
 if __name__ == "__main__":
     named = "/tmp/LoRa Device GPS.txt"
     def main():
-        print('===')
         foo = Network(named)
         bigsky = foo.__populate__()
         print(f'{[x[0] for x in bigsky.values()]}')

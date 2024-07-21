@@ -26,7 +26,7 @@ class Connection():
         '''
         roto_address = self.uri.split(':')
         if len(roto_address) != 3:
-            print(f'bad address provided: {roto_address}, {self.uri}. Expected a split of 3 for ":"')
+            print(f'bad address provided: {roto_address}, {self.uri}. Expected a split of 2 for ":"')
             raise ValueError
 
         self.protocol = roto_address[0]
@@ -63,9 +63,7 @@ class Connection():
         self.port = int(addr.split(':')[1].split(',')[0])
         self.username = addr.split(':')[1].split(',')[1]
         self.password = addr.split(':')[1].split(',')[2]
-        print(f'username {self.username}, password {self.password}')
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
-        print('===')
         self.state = 'open'
         return self.connection
 
@@ -76,16 +74,13 @@ class Connection():
             calls so that parallel actions may be supported.
         '''
         whole = str()
-        print(f'command [{cmd}]')
         channelW, channelR, channelEr = await self.connection.open_session(command=cmd)
         # buff = await channelR.readline()
         buff = await channelR.read(500)
-        print(f'.... {buff}')
         while channelR.at_eof() is False:
             whole += buff
             # buff = await channelR.readline()
             buff = await channelR.read(500)
-            print(f'.+.. {buff}')
 
         whole += buff
         return whole
@@ -99,7 +94,6 @@ class Connection():
             channelW, channelR, channelEr = self.connection.open_session(command=cmd)
             # returned = await self.issue(self, do_it)
             buff = await channelR.readline()
-            print('=1')
             while channelR.at_eof() is False:
                 # whole += buff
                 buff += await channelR.readline()

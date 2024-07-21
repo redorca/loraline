@@ -48,25 +48,24 @@ if __name__ == "__main__":
             pass through command line commands
         '''
         region = 'local'
-        if region == "local":
-            cmd = ['ls -l']
-            # cmd = ['#2 send tr to 4\\n']
 
         if len(sys.argv) > 1:
-            cmd = " ".join(sys.argv[1:])
+            cmd = [ " ".join(sys.argv[1:]) ]
         else:
             print('  No commands passed in, now\'s the time to exit')
-            exit(0)
+            raise ValueError
 
         host, port = await initialize.get_params(region)
         uri = await initialize.build_uri(host, port, "ssh", "wings", "mccartney")
-        client, connection = await connect(host)
+        client, connection = await connect(uri)
         if type(client) is None:
             print(f'error error error: No connection made.')
             exit(1)
-        cmd = ['#2 send tr to 4\\n']
         for entry in cmd:
             results = await client.issue(entry)
             print(f'{results}')
+    try:
+        asyncio.run(main())
+    except ValuError as val:
+        print(f'{val}')
 
-    asyncio.run(main())
