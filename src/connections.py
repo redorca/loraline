@@ -27,7 +27,7 @@ class Connection():
         roto_address = self.uri.split(':')
         if len(roto_address) != 3:
             print(f'bad address provided: {roto_address}, {self.uri}. Expected a split of 3 for ":"')
-            exit(1)
+            raise ValueError
 
         self.protocol = roto_address[0]
         # Strip off the leading '//'
@@ -56,14 +56,16 @@ class Connection():
 
         if len(addr.split(':')) != 2:
             print(f'=== bad address provided: {addr}')
-            exit(1)
+            raise ValueError
 
         self.target = addr.split(':')[0]
         self.protocol = "ssh"
         self.port = int(addr.split(':')[1].split(',')[0])
         self.username = addr.split(':')[1].split(',')[1]
         self.password = addr.split(':')[1].split(',')[2]
+        print(f'username {self.username}, password {self.password}')
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
+        print('===')
         self.state = 'open'
         return self.connection
 
@@ -74,11 +76,16 @@ class Connection():
             calls so that parallel actions may be supported.
         '''
         whole = str()
+        print(f'command [{cmd}]')
         channelW, channelR, channelEr = await self.connection.open_session(command=cmd)
-        buff = await channelR.readline()
+        # buff = await channelR.readline()
+        buff = await channelR.read(500)
+        print(f'.... {buff}')
         while channelR.at_eof() is False:
             whole += buff
-            buff = await channelR.readline()
+            # buff = await channelR.readline()
+            buff = await channelR.read(500)
+            print(f'.+.. {buff}')
 
         whole += buff
         return whole

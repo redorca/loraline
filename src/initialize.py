@@ -13,7 +13,14 @@ import configparser as parse
 
 Config_file = "/etc/loraline/netmanage.conf"
 
-async def get_params(func):
+async def build_uri(host, port, protocol, user, password):
+    elements = ":".join([protocol, ''.join(["//", host]), port])
+    uri = ",".join([elements, user, password])
+    print(f'host {host}, port {port} & uri {uri} built')
+    return uri
+
+
+async def get_params(region):
     '''
         Read in config file. Choose the set of parameters to use based on
         the location of the listener. A remote listener would use ssh_xxx
@@ -22,15 +29,14 @@ async def get_params(func):
     key_host = "cli_host"
     key_socket = "cli_socket"
 
-    if func == "remote":
+    if region == "remote":
         key_host = "ssh_host"
         key_socket = "ssh_socket"
 
     configs = parse.ConfigParser(allow_no_value=True)
-    foo = configs.read(Config_file)
-    listen_port = configs["network"][key_socket]
-    listen_system = configs["network"][key_host]
-
-    return listen_system, listen_port
+    configs.read(Config_file)
+    entries = configs.options("network")
+    want = [configs.get("network", x) for x in entries if x.split('.')[0] == "local"]
+    return want[1], want[0]
 
 
