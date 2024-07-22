@@ -8,16 +8,16 @@ import asyncio, asyncssh
 import sys, os, time
 
 class MySSHClientSession(asyncssh.SSHClientSession):
-    
+
     def __init__(self):
 #         print('init session')
         pass
-    
+
     def data_received(self, data: str, datatype: asyncssh.DataType) -> None:
         global from_lora
         print(f'{data}', end='')
         from_lora = data
-        
+
     def write(self, msg: str) -> None:
         print("in write")
         print('to device ['+msg.strip()+']') # debug
@@ -26,13 +26,14 @@ class MySSHClientSession(asyncssh.SSHClientSession):
             ret = self.stdout.write(msg) # need to get rid of return value
         except:    # seems like a connection went down
             pass
-        
+
+
 class MySSHClient(asyncssh.SSHClient):
-    
+
     def __init__(self):
 #         print('init client')
         pass
-    
+
     def connection_made(self, conn: asyncssh.SSHClientConnection) -> None:
         print(f'Connection made to server IP {conn.get_extra_info("peername")[0]}')
         self._conn = conn
@@ -41,7 +42,8 @@ class MySSHClient(asyncssh.SSHClient):
     def auth_completed(self) -> None:
 #         print('Authentication successful.')
         pass
-    
+
+
 async def lora_answer(timeout) -> str:
     global from_lora
     #print("in lora_answer")
@@ -52,7 +54,8 @@ async def lora_answer(timeout) -> str:
             return False  # Return False if timeout is reached
         await asyncio.sleep(0.1)  # Check every 0.1 seconds
     return True  # Return True if variable changes
-        
+
+
 async def runCommands(chan):
     if "Palo Alto" in site:
         adminID = 6
@@ -73,17 +76,23 @@ async def runCommands(chan):
         await lora_answer(15)
         """
         await lora_answer(30)    # wait for any final responses to arrive
-       
+
+
+async def waitwait(time):
+    await asyncio.sleep(time)     # end 10 seconds later
+
+
 async def main():
     if sys.platform == 'win32':
         port = 8022; server = 'switchboard.saal.org'; key_path = 'C:/Users/'+os.getlogin()
     else:      # suppose we are linux
         port = 8022; server = 'localhost'; key_path = '/home/' + os.getlogin()
     os.chdir(key_path + '/OTA' )
+    port = 22
 #     print(port, server, key_path, os.getcwd())
     # Create a connection
     conn, client = await asyncssh.create_connection(MySSHClient,
-            server, port = port, username = '$admin', password = 'as', known_hosts=None)
+            server, port = port, username = 'rock', password = 'lobstser', known_hosts=None)
 #     print('connected')
     chan, session = await conn.create_session(MySSHClientSession)
     print('session made')
@@ -112,9 +121,6 @@ if sys.platform == 'win32':
 else:
     asyncio.run(main())
     waitwait(10)
-
-async def waitwait(time):
-    await asyncio.sleep(time)     # end 10 seconds later
 
 
 # In[ ]:
