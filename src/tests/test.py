@@ -56,7 +56,7 @@ if __name__ == "__main__":
             raise ValueError
 
         host, port = await initialize.get_params(region)
-        uri = await initialize.build_uri(host, port, "ssh", "wings", "mccartney")
+        uri = await initialize.build_uri(host, port, "ssh", "rock", "lobster")
         client, connection = await connect(uri)
         if type(client) is None:
             print(f'error error error: No connection made.')
@@ -66,6 +66,6 @@ if __name__ == "__main__":
             print(f'{results}')
     try:
         asyncio.run(main())
-    except ValuError as val:
+    except ValueError as val:
         print(f'{val}')
 
