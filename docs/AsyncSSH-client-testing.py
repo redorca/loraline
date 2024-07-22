@@ -111,7 +111,10 @@ if sys.platform == 'win32':
     loop.create_task(main())
 else:
     asyncio.run(main())
-await asyncio.sleep(10)     # end 10 seconds later
+    waitwait(10)
+
+async def waitwait(time):
+    await asyncio.sleep(time)     # end 10 seconds later
 
 
 # In[ ]:
