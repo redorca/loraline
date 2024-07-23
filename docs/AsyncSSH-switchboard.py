@@ -49,22 +49,22 @@ def uppercase_outside_quotes(text):
             char = char.upper()
         result.append(char)
     return ''.join(result)
-  
+
 def is_ip_reachable(ip):
     if os.system(f'ping {ip} -w 5 > clear') == 0:
         return True  # IP is reachable
     else:
         return False  # IP is not reachable
-    
+
 def green_flasher():
     global led_state          # flip it each time we are called
-    
+
     if led_state == 'none':
         led_state = 'default-on'
     else:
         led_state = 'none'
-        
-    result = subprocess.run("echo " + led_state + " > /sys/class/leds/green_led/trigger", 
+
+    result = subprocess.run("echo " + led_state + " > /sys/class/leds/green_led/trigger",
                             capture_output=False, shell=True, text=True)
 
 def getZone(timezone_name):
@@ -78,17 +78,17 @@ def getZone(timezone_name):
         return ("PST+8")
     else:
         return("PDT+7")
-    
+
 if sys.platform == 'win32':
     port = 8022; key_path = 'C:/Users/'+os.getlogin()
 else:      # suppose we are linux
     ports = [22, 8022]; key_path = '/home/' + 'harry'   #  os.getlogin()
-    
+
 os.chdir(key_path)
 if not os.path.exists(key_path + '/OTA'):
     os.mkdir(key_path + '/OTA')
 for dir in ['console', 'repeater', 'tbeam', 'raw', 'tbeam1262', 'tdeck', 'twatch']:
-    dirX = key_path + '/OTA/' + dir   
+    dirX = key_path + '/OTA/' + dir
     if not os.path.exists(dirX):
         os.mkdir(dirX)
 # print('Default dir = '+os.getcwd())
@@ -96,13 +96,13 @@ for dir in ['console', 'repeater', 'tbeam', 'raw', 'tbeam1262', 'tdeck', 'twatch
 is_online = is_ip_reachable('8.8.8.8')   # google DNS
 
 class MySFTPServer(asyncssh.SFTPServer):
-    
+
     def __init__(self, chan: asyncssh.SSHServerChannel):
         self._chroot = None
         self._ip = chan.get_extra_info('peername')[0]
         self._username = chan.get_extra_info('username')
         print(timeStamp() + f'IP {self._ip} SCPing as user {self._username}' )
-        
+
     async def open(self, path, pflags, attrs):
         # Open the file and return an SFTPFile object
         file_obj = super().open(path, pflags, attrs)
@@ -116,7 +116,7 @@ class MySFTPServer(asyncssh.SFTPServer):
         # Perform the read operation
         data = super().read(handle, offset, length)
         #print("Reading @", offset)
-        
+
         if offset == 0:
             # Get the file object from the handle
             file_obj = self.file_obj
@@ -136,7 +136,7 @@ class MySFTPServer(asyncssh.SFTPServer):
         return data
 
 class MySSHServer(asyncssh.SSHServer):
-    
+
     def undo_connection(self):
         global online
         # print(timeStamp() + f'{self._username} has disconnected.')
@@ -156,13 +156,13 @@ class MySSHServer(asyncssh.SSHServer):
                 if adm._answerback == self._username:
                     # print('removing answerback...')
                     adm._answerback = None
-        
+
     def connection_made(self, conn: asyncssh.SSHServerConnection) -> None:
         self._conn = conn
         self._username = None
         self._ip = conn.get_extra_info('peername')[0]
         conn.set_keepalive(10,3)          # set keepalive parameters for this specific connection (30 seconds)
-        print(timeStamp() + 'SSH connection received from %s.' % self._ip + 
+        print(timeStamp() + 'SSH connection received from %s.' % self._ip +
             f" Free memory: {get_free_memory() / (1024 ** 3):.3f} GB")
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
@@ -174,7 +174,7 @@ class MySSHServer(asyncssh.SSHServer):
                         adm.write(timeStamp() + '%s not responding to keepalive.' % self._username)
                 self.undo_connection()
                 self._conn.close()
-                return 
+                return
             if "[Errno 104]" in str(exc):
                 self.undo_connection()
                 self._conn.close()
@@ -183,7 +183,7 @@ class MySSHServer(asyncssh.SSHServer):
                 print('*******')     # catch why we crash
         self.undo_connection()
         self._conn.close()
-            
+
     def begin_auth(self, username: str) -> bool:
         #global shuttingDown
         if shuttingDown:
@@ -210,7 +210,7 @@ class MySSHServer(asyncssh.SSHServer):
         else:
             self._conn.close()
             return False
-            
+
     def auth_completed(self) -> None:
         global online
         # print(f'Authorized....{self._username}')
@@ -235,7 +235,7 @@ class SSHClient:
         self._default = None      # Admin: station # of any default I have set
         self._answerback = None   # Admin: station # for temporary command
         self._toAdmin = None      # Device: process id of any admin
-                
+
     async def readline(self) -> str:
         return await cast(str, self._process.stdin.readline())
 
@@ -247,12 +247,12 @@ class SSHClient:
         except:    # seems like a connection went down
             pass   # unclear what to do here....
             #raise AssertionError("Connection went down.")
-        
+
     def adminsWrite(self, msg: str) -> None:
         #print(f'Writing to admins: [{msg.strip()}]')
         for admin in admins:
             admin.write(msg)
-            
+
     def forward(self, target: str, msg: str) -> None:
         global online
         # print(f'forwarding to {target} [{msg.strip()}]')
@@ -260,11 +260,11 @@ class SSHClient:
             self.write(f'Default target not set.')
         elif online.get(target,None) != None:
             online[target].write(msg)
-        else: self.write(f'{target} not online.') 
-            
+        else: self.write(f'{target} not online.')
+
     def getHistory(self) -> list:
         return self._history
-    
+
 #     def mapOutput(self, source: str) -> None:
 # #         for src, adm in self._toAdmin.items():
 # #             if src == source and adm != self:
@@ -272,12 +272,12 @@ class SSHClient:
 # #                 adm._default = None
 #         self._toAdmin[source] = self
 #         print(f'toAdmin={self._toAdmin}')
-                
+
     @classmethod
     async def handle_client(cls, process: asyncssh.SSHServerProcess):
         # print('handle_client called')  # debug
         await cls(process).run()
-        
+
     async def run(self) -> None:
         global online, admins
         #global shuttingDown
@@ -285,7 +285,7 @@ class SSHClient:
         if self._username == '$admin':               # admin I/O
             #self._process.channel.set_line_mode(True)
             #self._process.channel.set_echo(True)
-            
+
             self.write(f'{len(online.keys())} devices are connected.')
             admins.add(self)
             self._default = None
@@ -293,7 +293,7 @@ class SSHClient:
             while not self._process.stdin.at_eof():
                 try:            # reading from admin station
                     async for line_in in self._process.stdin:
-                        
+
                         # a new input line cancels an answerback
                         if self._answerback != None:
                             online[self._answerback]._toAdmin = None
@@ -335,7 +335,7 @@ class SSHClient:
                                     self._answerback = line
                                     online.get(line)._toAdmin = self
                                     # print(f'default={self._default}')
-                                else: self.write(f'{line} not online.')  
+                                else: self.write(f'{line} not online.')
                             else:
                                 onetime = line_in[1:].strip().split(' ',1)
                                 if onetime != None:
@@ -396,12 +396,12 @@ class SSHClient:
             try:
                 async for line in self._process.stdin: # reading from remote output
                         line = line.strip()
-                        if len(line) == 0: 
+                        if len(line) == 0:
                             continue    # lines which are blanks\n are ignored
                         if not is_online: print(f'line from {self._username} [{line}]')
                         self._history.append(line)
                         if (len(self._history) > maxHist):
-                            del self._history[0] 
+                            del self._history[0]
                         if len(line) != 0 and self._toAdmin != None:    # is an admin listening to me?
                             try:
                                 # print(f'Sending line to {self._toAdmin._username}')  # debug
@@ -447,7 +447,7 @@ async def start_server(port) -> None:
             server_host_keys=[key_path+'/.ssh/ssh_host_rsa_key'],
             process_factory=SSHClient.handle_client,
             sftp_factory=MySFTPServer,
-            keepalive_interval=10, keepalive_count_max=6, allow_scp=True)   # allow 60 seconds max                                   
+            keepalive_interval=10, keepalive_count_max=6, allow_scp=True)   # allow 60 seconds max
     except OSError:
         # Too soon to restart
         raise TooSoon
@@ -456,7 +456,7 @@ async def flash_forever():
 # Keep the main coroutine running indefinitely
     while True:
         if not is_online: green_flasher()          # change the state of the green LED
-        await asyncio.sleep(5)   # every 5 seconds       
+        await asyncio.sleep(5)   # every 5 seconds
 
 async def linux_main():
     await asyncio.gather(
