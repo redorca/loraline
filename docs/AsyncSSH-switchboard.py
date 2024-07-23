@@ -79,19 +79,24 @@ def getZone(timezone_name):
     else:
         return("PDT+7")
 
+#
+# This is a system independent command. echo $HOME in power shell is the same as echo $HOME in bash
+key_path = os.getenv("HOME")
 if sys.platform == 'win32':
-    port = 8022; key_path = 'C:/Users/'+os.getlogin()
+    # port = 8022; key_path = 'C:/Users/'+os.getlogin()
+    port = 8022 # does it matter that key_path uses '\' rather than '/'?
 else:      # suppose we are linux
-    ports = [22, 8022]; key_path = '/home/' + 'harry'   #  os.getlogin()
+    ports = [22, 8022];
 
+print(f'key_path, {key_path}')
 os.chdir(key_path)
-if not os.path.exists(key_path + '/OTA'):
-    os.mkdir(key_path + '/OTA')
-for dir in ['console', 'repeater', 'tbeam', 'raw', 'tbeam1262', 'tdeck', 'twatch']:
-    dirX = key_path + '/OTA/' + dir
-    if not os.path.exists(dirX):
+home_dir_name = "OTA"
+if not os.path.exists((local_path := os.path.join(key_path, home_dir_name))):
+    os.mkdir(local_path)
+
+for diry in ['console', 'repeater', 'tbeam', 'raw', 'tbeam1262', 'tdeck', 'twatch']:
+    if not os.path.exists(dirX := os.path.join(local_path, diry)):
         os.mkdir(dirX)
-# print('Default dir = '+os.getcwd())
 
 is_online = is_ip_reachable('8.8.8.8')   # google DNS
 
@@ -419,14 +424,12 @@ class SSHClient:
                             if currently[1] != 'model': raise TypeError("Can't update. Missing model.")
                             if currently[3] != 'build': raise TypeError("Can't update. Missing build.")
                             current_build = float(currently[4])
-                            # print('model=%s build=%s' % (currently[2], currently[4]))
-                            OTA_path = 'OTA/%s/' % currently[2]
-                            latest_file = OTA_path + 'latest.txt'
-                            if not os.path.isfile(latest_file): raise TypeError("Can't update. Missing latest.txt")
+                            if not os.path.isfile(latest_file := os.path.join('OTA_path', 'latest.txt')):
+                                raise TypeError(f"Can't update. Missing latest.txt {latest_file}")
                             with open(latest_file, "r") as f:
                                 latest = f.readline().strip().split('=')
-                            if len(latest) != 2: raise TypeError("Can't update. Bad latest.txt format.")
-                            if latest[0] != 'build': raise Exception("Can't update. Bad latest.txt format.")
+                            if len(latest) != 2: raise TypeError("Can't update. Bad latest.txt ({latest_file}) format.")
+                            if latest[0] != 'build': raise Exception(f"Can't update. Bad latest.txt ({latest_file}) format.")
                             latest_build = float(latest[1])
                             if not is_online:
                                 print('for model %s latest build is %.2f current build is %.2f' % (currently[2],latest_build,current_build))
@@ -444,9 +447,6 @@ async def start_server(port) -> None:
     print('starting %s server on port %d' % (sys.platform, port))
     try:
         await asyncssh.create_server(MySSHServer,'', port,
-            server_host_keys=[key_path+'/.ssh/ssh_host_rsa_key'],
-            process_factory=SSHClient.handle_client,
-            sftp_factory=MySFTPServer,
             keepalive_interval=10, keepalive_count_max=6, allow_scp=True)   # allow 60 seconds max
     except OSError:
         # Too soon to restart
@@ -460,8 +460,9 @@ async def flash_forever():
 
 async def linux_main():
     await asyncio.gather(
-        start_server(ports[0]),
-        start_server(ports[1]))
+        [start_server[x] for x in len(ports)]
+        # start_server(ports[0]),
+        # start_server(ports[1]))
     await asyncio.create_task(flash_forever())
 
 if __name__ == '__main__':
