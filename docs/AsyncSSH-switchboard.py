@@ -59,6 +59,9 @@ def is_ip_reachable(ip):
 def green_flasher():
     global led_state          # flip it each time we are called
 
+    if not os.path.exists('/sys/class/leds/green_led'):
+        return
+
     if led_state == 'none':
         led_state = 'default-on'
     else:
@@ -86,7 +89,8 @@ if sys.platform == 'win32':
     # port = 8022; key_path = 'C:/Users/'+os.getlogin()
     port = 8022 # does it matter that key_path uses '\' rather than '/'?
 else:      # suppose we are linux
-    ports = [22, 8022];
+    # ports = [22, 8022];
+    ports = [8022];
 
 print(f'key_path, {key_path}')
 os.chdir(key_path)
@@ -459,12 +463,11 @@ async def flash_forever():
         await asyncio.sleep(5)   # every 5 seconds
 
 async def linux_main():
-    await asyncio.gather(
-        [start_server[x] for x in len(ports)]
-        # start_server(ports[0]),
-        # start_server(ports[1]))
+    tasks = [asyncio.create_task(start_server(x)) for x in ports]
+    await asyncio.gather    (
+            *tasks
+            )
     await asyncio.create_task(flash_forever())
-
 if __name__ == '__main__':
     while True:
         try:

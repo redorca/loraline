@@ -86,13 +86,14 @@ async def main():
     if sys.platform == 'win32':
         port = 8022; server = 'switchboard.saal.org'; key_path = 'C:/Users/'+os.getlogin()
     else:      # suppose we are linux
-        port = 8022; server = 'localhost'; key_path = '/home/' + os.getlogin()
+        # port = 8022; server = 'localhost'; key_path = '/home/' + os.getlogin()
+        port = 8022; server = 'localhost'; key_path = os.getenv('HOME')
     os.chdir(key_path + '/OTA' )
-    port = 22
+    # port = 22
 #     print(port, server, key_path, os.getcwd())
     # Create a connection
     conn, client = await asyncssh.create_connection(MySSHClient,
-            server, port = port, username = 'rock', password = 'lobstser', known_hosts=None)
+            server, port = port, username = os.getenv('TARGET_USER'), password = os.getenv('TARGET_PASS'), known_hosts=None)
 #     print('connected')
     chan, session = await conn.create_session(MySSHClientSession)
     print('session made')
@@ -121,10 +122,3 @@ if sys.platform == 'win32':
 else:
     asyncio.run(main())
     waitwait(10)
-
-
-# In[ ]:
-
-
-
-
