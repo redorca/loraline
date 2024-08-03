@@ -6,6 +6,7 @@
 
 import asyncio, asyncssh
 import sys, os, time
+import logging
 
 class MySSHClientSession(asyncssh.SSHClientSession):
 
@@ -89,12 +90,14 @@ async def main():
         # port = 8022; server = 'localhost'; key_path = '/home/' + os.getlogin()
         port = 8022; server = 'localhost'; key_path = os.getenv('HOME')
     os.chdir(key_path + '/OTA' )
+    asyncssh.set_log_level(logging.DEBUG)
+    asyncssh.set_debug_level(3)
     # port = 22
-#     print(port, server, key_path, os.getcwd())
+    # print(port, server, key_path, os.getcwd())
     # Create a connection
     conn, client = await asyncssh.create_connection(MySSHClient,
             server, port = port, username = os.getenv('TARGET_USER'), password = os.getenv('TARGET_PASS'), known_hosts=None)
-#     print('connected')
+    # print('connected')
     chan, session = await conn.create_session(MySSHClientSession)
     print('session made')
     await lora_answer(15)    # 15 second timeout
