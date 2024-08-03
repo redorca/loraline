@@ -9,9 +9,25 @@ CONFIGDIR = etc/loraline/
 SYSTEMDIR = lib/systemd/system/
 UNITFILES = ${PACKAGE}.service ${PACKAGE}.socket
 CONFFILE  = netmanage.conf
+SOURCES = cmds tests connections.py debian
 
-${SYSTEMDIR} ${CONFIGDIR}:
+MKDIR = mkdir -p
+RM = rm -f
+CP = cp
+
+${SYSTEMDIR} ${CONFIGDIR} ${BUILDDIR}:
 	@${MKDIR} $@
+
+setup: ${BUILDDIR}
+	@for name in ${SOURCES} ; do \
+		${CP} -a $${name} ${BUILDDIR} ;\
+	done
+	@find ${BUILDDIR} -name .gitignore -exec rm {} \;
+	@for target in $$(find ${BUILDDIR} -name __pycache__ -type d) ; do \
+		echo "target $${target}" ;\
+		rm -rf $${target} ; \
+		done
+
 
 systemd: ${SYSTEMDIR}
 	@cp lib/systemd/system/netmanage.s* debin/
@@ -22,3 +38,7 @@ config: ${CONFIGDIR}
 rooted: ${CONFIGDIR:%=/%}
 	@sudo cp ${CONFIGDIR}/${CONFFILE} $^
 
+cleandeb:
+	@${RM} -r ${BUILDDIR}
+
+clean: cleandeb
