@@ -58,9 +58,10 @@ def smersh(filename, legend, delim=':'):
     nodes = list()
     with open(filename, 'r') as spot:
         while (foo := spot.readline().strip()):
-            # print(f'foo {foo.split(delim)}')
-            xoo = list(map(mkdict, legend, foo.split(delim)))
-            nodes.append(dict(xoo))
+            if foo[0] != '#':
+                # xoo = list(map(mkdict, legend, foo.split(delim)))
+                # nodes.append(dict(xoo))
+                nodes.append(foo.split(delim))
     return nodes
 
 def main():
@@ -68,8 +69,12 @@ def main():
         read in a file into configparser
     '''
     # network = smersh('/tmp/nodes', ["Name", "ID", "GPS"])
-    # [ print(f'Name {line["Name"]}') for line in network ]
-    # exit(0)
+    # [ print(f'Name {line["Name"]}, {line["ID"]}, {line["GPS"]}') for line in network ]
+    pkt = smersh('/tmp/signals.txt', ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], delim="{")
+    # [ print(f'{line[1].strip("}")}') for line in pkt if len(line) > 1]
+    # [ print(f'{line[0]}') for line in pkt if len(line) == 1]
+    foo = [ print(f'{xray}') for  xray in line[1].strip("}").split(",") for line in pkt if len(line) > 1]
+    exit(0)
     foo = toml_parse(NACKFILE)
     print(f'foo {foo}')
     exit(0)
