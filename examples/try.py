@@ -65,10 +65,15 @@ def decode(filename, delim=':'):
             if info[0] != '#':
                 duo = info.split('{')
                 if len(duo) > 1:
-                    first = duo[1].split(":")[1].strip()
-                    second = duo[1].split(":")[1].strip()
-                    print(f'{}')
-        exit(0)
+                    zed = duo[0].split(' ')
+                    ident = zed[3].strip(':')
+                    print(f'ident {ident}')
+                    alpha = duo[1].strip("}")
+                    dummy = alpha.split(",")[0].split(":")
+                    ruff[dummy[0].strip('"')] = dummy[1]
+                    dummy = alpha.split(",")[1].split(":")
+                    ruff[dummy[0].strip('"')] = dummy[1]
+                    nodes.append(ruff)
     return nodes
 
 
