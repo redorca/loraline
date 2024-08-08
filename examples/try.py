@@ -54,26 +54,33 @@ def mkdict(key, item):
     return (key, item)
 
 
-def decode_map(filename, delim=':'):
+def decode(filename, delim=':'):
     '''
         The info file contains a set of json objects and decode ala json.dumps()
     '''
     nodes = list()
-    ruff = dict()
     with open(filename, 'r') as spot:
         while( info := spot.readline().strip()):
             if info[0] != '#':
                 duo = info.split('{')
                 if len(duo) > 1:
-                    ruff["ident"] = duo[0].split(' ')[3].strip(':')
-                    alpha = duo[1].strip("}")
-                    dummy = alpha.split(",")[0].split(":")
-                    ruff[dummy[0].strip('"')] = dummy[1]
-                    dummy = alpha.split(",")[1].split(":")
-                    ruff[dummy[0].strip('"')] = dummy[1]
-                    nodes.append(ruff)
+                    nodes.append(decode_map(duo))
     return nodes
 
+
+def decode_map(squiggle):
+    '''
+        data specific decode intended for return by return parsing akin to line by line.
+    '''
+    ruff = dict()
+    ruff["ident"] = squiggle[0].split(' ')[3].strip(':')
+    alpha = squiggle[1].strip("}")
+    dummy = alpha.split(",")[0].split(":")
+    ruff[dummy[0].strip('"')] = dummy[1]
+    dummy = alpha.split(",")[1].split(":")
+    ruff[dummy[0].strip('"')] = dummy[1]
+
+    return ruff
 
 def smersh(filename, legend, delim=':'):
     '''
@@ -94,18 +101,9 @@ def main():
     '''
         read in a file into configparser
     '''
-    for result in decode_map(SIGNAL, delim='{'):
+    for result in decode(SIGNAL, delim='{'):
         print(f'== ident {result["ident"]}, SNR {result["SNR"]}')
 
-    exit(0)
-    # network = smersh(NODES, ["Name", "ID", "GPS"])
-    # [ print(f'Name {line["Name"]}, {line["ID"]}, {line["GPS"]}') for line in network ]
-    pkt = smersh(SIGNAL, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], delim="{")
-    # [ print(f'{line[1].strip("}")}') for line in pkt if len(line) > 1]
-    # [ print(f'{line[0]}') for line in pkt if len(line) == 1]
-    # foo = [ print(f'{xray}') for line in pkt if len(line) > 1 for  xray in line[1].strip("}").split(",")]
-    foo = [ xray for line in pkt if len(line) > 1 for  xray in line[1].strip("}").split(",")]
-    print(f'=== {foo}')
     exit(0)
     foo = toml_parse(NACKFILE)
     print(f'foo {foo}')
