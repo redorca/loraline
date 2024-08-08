@@ -63,13 +63,12 @@ def decode(filename, delim=':'):
     with open(filename, 'r') as spot:
         while( info := spot.readline().strip()):
             if info[0] != '#':
-                if (foo := info.split(delim)) and len(foo) > 1:
-                    fruh = ','.join([foo[0], foo[1].strip("}")])
-                    goof = list(json.dumps(fruh).split(','))
-                    one = goof[1].split(':')[0].lstrip("\\").strip('", \\')
-                    ruff[one] = goof[1].split(':')[1].lstrip('\\').strip("\", \\")
-                    nodes.append(ruff)
-
+                duo = info.split('{')
+                if len(duo) > 1:
+                    first = duo[1].split(":")[1].strip()
+                    second = duo[1].split(":")[1].strip()
+                    print(f'{}')
+        exit(0)
     return nodes
 
 
