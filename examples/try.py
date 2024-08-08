@@ -2,12 +2,14 @@
     figure out how to use a plain text file as a config file suitable for ConfigParser
 '''
 
+import json
 import configparser
 import tomllib
 
 ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
-
+NODES    = "/tmp/nodes.txt"
+SIGNAL   = "/tmp/signals.txt"
 
 def toml_parse(filepath):
     '''
@@ -45,10 +47,31 @@ def reparse(filepath):
         cparse = None
     return cparse
 
+
 Topo = dict()
 
 def mkdict(key, item):
     return (key, item)
+
+
+def decode(filename, delim=':'):
+    '''
+        The info file contains a set of json objects and decode ala json.dumps()
+    '''
+    nodes = list()
+    ruff = dict()
+    with open(filename, 'r') as spot:
+        while( info := spot.readline().strip()):
+            if info[0] != '#':
+                if (foo := info.split(delim)) and len(foo) > 1:
+                    fruh = ','.join([foo[0], foo[1].strip("}")])
+                    goof = list(json.dumps(fruh).split(','))
+                    one = goof[1].split(':')[0].lstrip("\\").strip('", \\')
+                    ruff[one] = goof[1].split(':')[1].lstrip('\\').strip("\", \\")
+                    nodes.append(ruff)
+
+    return nodes
+
 
 def smersh(filename, legend, delim=':'):
     '''
@@ -61,16 +84,21 @@ def smersh(filename, legend, delim=':'):
             if foo[0] != '#':
                 # xoo = list(map(mkdict, legend, foo.split(delim)))
                 # nodes.append(dict(xoo))
-                nodes.append(foo.split(delim))
+                nodes.append(foo.split(delim)[1])
     return nodes
+
 
 def main():
     '''
         read in a file into configparser
     '''
-    # network = smersh('/tmp/nodes', ["Name", "ID", "GPS"])
+    for result in decode(SIGNAL, delim='{'):
+        print(f'{result}')
+
+    exit(0)
+    # network = smersh(NODES, ["Name", "ID", "GPS"])
     # [ print(f'Name {line["Name"]}, {line["ID"]}, {line["GPS"]}') for line in network ]
-    pkt = smersh('/tmp/signals.txt', ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], delim="{")
+    pkt = smersh(SIGNAL, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], delim="{")
     # [ print(f'{line[1].strip("}")}') for line in pkt if len(line) > 1]
     # [ print(f'{line[0]}') for line in pkt if len(line) == 1]
     # foo = [ print(f'{xray}') for line in pkt if len(line) > 1 for  xray in line[1].strip("}").split(",")]
@@ -89,5 +117,6 @@ def main():
     if (config :=  toml_parse(NACKFILE)) != None:
         print(f'tomllll')
         exit(0)
+
 
 main()
