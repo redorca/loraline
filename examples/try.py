@@ -54,7 +54,7 @@ def mkdict(key, item):
     return (key, item)
 
 
-def decode(filename, delim=':'):
+def decode_map(filename, delim=':'):
     '''
         The info file contains a set of json objects and decode ala json.dumps()
     '''
@@ -65,9 +65,7 @@ def decode(filename, delim=':'):
             if info[0] != '#':
                 duo = info.split('{')
                 if len(duo) > 1:
-                    zed = duo[0].split(' ')
-                    ident = zed[3].strip(':')
-                    print(f'ident {ident}')
+                    ruff["ident"] = duo[0].split(' ')[3].strip(':')
                     alpha = duo[1].strip("}")
                     dummy = alpha.split(",")[0].split(":")
                     ruff[dummy[0].strip('"')] = dummy[1]
@@ -96,8 +94,8 @@ def main():
     '''
         read in a file into configparser
     '''
-    for result in decode(SIGNAL, delim='{'):
-        print(f'{result}')
+    for result in decode_map(SIGNAL, delim='{'):
+        print(f'== ident {result["ident"]}, SNR {result["SNR"]}')
 
     exit(0)
     # network = smersh(NODES, ["Name", "ID", "GPS"])
