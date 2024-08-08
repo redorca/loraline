@@ -73,7 +73,9 @@ def main():
     pkt = smersh('/tmp/signals.txt', ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"], delim="{")
     # [ print(f'{line[1].strip("}")}') for line in pkt if len(line) > 1]
     # [ print(f'{line[0]}') for line in pkt if len(line) == 1]
-    foo = [ print(f'{xray}') for  xray in line[1].strip("}").split(",") for line in pkt if len(line) > 1]
+    # foo = [ print(f'{xray}') for line in pkt if len(line) > 1 for  xray in line[1].strip("}").split(",")]
+    foo = [ xray for line in pkt if len(line) > 1 for  xray in line[1].strip("}").split(",")]
+    print(f'=== {foo}')
     exit(0)
     foo = toml_parse(NACKFILE)
     print(f'foo {foo}')
