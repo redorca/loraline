@@ -82,9 +82,9 @@ def decode_map(squiggle):
     dummy = alpha.split(",")[0].split(":")
     rummy = alpha.split(",")[1].split(":")
     # Assemble a bunch of tuples into a list that can then be turned into a dict
-    sterr = [mktuple(dummy[0].strip('"'), dummy[1]),
-             mktuple(rummy[0].strip('"'), rummy[1]),
-             mktuple("id", squiggle[0].split(' ')[3].strip(':'))]
+    sterr = [(dummy[0].strip('"'), dummy[1]),
+             (rummy[0].strip('"'), rummy[1]),
+             ("id", squiggle[0].split(' ')[3].strip(':'))]
     return dict(sterr)
 
 
