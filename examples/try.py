@@ -10,6 +10,7 @@ ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
 NODES    = "/tmp/nodes.txt"
 SIGNAL   = "/tmp/signals.txt"
+network = list()
 
 def toml_parse(filepath):
     '''
@@ -73,14 +74,25 @@ def decode_map(squiggle):
         data specific decode intended for return by return parsing akin to line by line.
     '''
     ruff = dict()
-    ruff["ident"] = squiggle[0].split(' ')[3].strip(':')
+    ruff["id"] = squiggle[0].split(' ')[3].strip(':')
     alpha = squiggle[1].strip("}")
     dummy = alpha.split(",")[0].split(":")
     ruff[dummy[0].strip('"')] = dummy[1]
     dummy = alpha.split(",")[1].split(":")
     ruff[dummy[0].strip('"')] = dummy[1]
-
     return ruff
+
+def find_name(ident, mapping):
+    '''
+        lookup an entry in the network list that matches the ident passed in.
+        So, basically an address to name map
+    '''
+    for cache in mapping:
+        # print(f'mapping cache {cache}')
+        if cache['ID'] == ident:
+            return cache
+
+
 
 def smersh(filename, legend, delim=':'):
     '''
@@ -91,18 +103,23 @@ def smersh(filename, legend, delim=':'):
     with open(filename, 'r') as spot:
         while (foo := spot.readline().strip()):
             if foo[0] != '#':
-                # xoo = list(map(mkdict, legend, foo.split(delim)))
-                # nodes.append(dict(xoo))
-                nodes.append(foo.split(delim)[1])
+                xoo = list(map(mkdict, legend, foo.split(delim)))
+                nodes.append(dict(xoo))
     return nodes
-
 
 def main():
     '''
         read in a file into configparser
     '''
+    falala = list()
+    network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
+    # [ print(f'Name {line["Name"]}, ID {line["ID"]}, GPS {line["GPS"]}') for line in network ]
     for result in decode(SIGNAL, delim='{'):
-        print(f'== ident {result["ident"]}, SNR {result["SNR"]}')
+        spore = find_name(result['id'], network)
+        whole = {**spore, **result}
+        falala.append(whole)
+        print(f' Name {whole["Name"]}, SNR {whole["SNR"]}')
+        # print(f'== ident {result["id"]}, map {result["map"]}, SNR {result["SNR"]}')
 
     exit(0)
     foo = toml_parse(NACKFILE)
