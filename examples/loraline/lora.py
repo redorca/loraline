@@ -11,15 +11,6 @@ class network():
         self.admin_prefix = '#'
 
     @property
-    def _gateway_(self):
-        raise(ValueError)
-        return 8
-
-    @_gateway_.setter
-    def _gateway_(self, value):
-        raise(ValueError)
-
-    @property
     def gateway(self):
         '''
             Commands are issued onto the LoRa network from one of its nodes
@@ -34,16 +25,6 @@ class network():
         return
 
 @property
-def gateway_():
-    raise(ValueError)
-    return 88
-
-@gateway_.setter
-def gateway_(value):
-    gateway_ = 11
-    raise(ValueError)
-
-@property
 def gateway():
     '''
         Commands are issued onto the LoRa network from one of its nodes
@@ -52,9 +33,8 @@ def gateway():
     '''
     return gateway_
 
-'''
+
 @gateway.setter
 def gateway(value):
     _gateway_ = value
     return
-'''
