@@ -1,7 +1,7 @@
 '''
     Support every lora command available.
 '''
-from LoRa import net
+from loraline import net
 
 class get():
     '''
