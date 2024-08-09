@@ -1,7 +1,7 @@
 '''
     Support every lora command available.
 '''
-from loraline import net
+from loraline import lora
 
 class get():
     '''
@@ -16,9 +16,10 @@ class get():
     def issue():
         return
 
+def main():
+    foo = lora.network(0)
+    print(f'lora.gateway {lora.gateway}')
+    print(f'lora.gateway_ {lora._gateway_}')
+
 if __name__ == "__main__":
-    def main():
-        foo = get()
-        lora.gateway = 21
-        f = lora.gateway
-        print(f'gateway {lora.gateway}')
+        main()
