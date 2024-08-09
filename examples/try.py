@@ -10,7 +10,7 @@ import tomllib
 ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
 NODES    = "/tmp/nodes.txt"
-SIGNAL   = "/tmp/signals.txt"
+SIGNALS  = "/tmp/signals.txt"
 network = list()
 
 def toml_parse(filepath):
@@ -50,8 +50,6 @@ def reparse(filepath):
     return cparse
 
 
-Topo = dict()
-
 def mktuple(key, item):
     return (key, item)
 
@@ -60,6 +58,8 @@ def decode(filename, delim=':'):
     '''
         The info file contains a set of json objects and decode ala json.dumps()
     '''
+    if not os.path.exists(filename):
+        return None
     nodes = list()
     with open(filename, 'r') as spot:
         while( info := spot.readline().strip()):
@@ -108,6 +108,8 @@ def smersh(filename, legend, delim=':'):
         Convert a text file of data lines into a list of dictoinaries using
         legend as the keys in the dictionary in the order to be decoded from the text line.
     '''
+    if not os.path.exists(filename):
+        return None
     nodes = list()
     with open(filename, 'r') as spot:
         while (foo := spot.readline().strip()):
@@ -120,10 +122,17 @@ def main():
     '''
         read in a file into configparser
     '''
+    if not os.path.exists(NODES):
+        print(f'Can\'t find {NODES}.')
+        exit(1)
+    if not os.path.exists(SIGNALS):
+        print(f'Can\'t find {SIGNALS}.')
+        exit(1)
     falala = list()
     network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
+
     # [ print(f'Name {line["Name"]}, ID {line["ID"]}, GPS {line["GPS"]}') for line in network ]
-    for result in decode(SIGNAL, delim='{'):
+    for result in decode(SIGNALS, delim='{'):
         spore = find_name(result['id'], network)
         print(f'{result["id"]}  spore {spore}')
         # print(f'--- {find_name(result['id'], network)}')
