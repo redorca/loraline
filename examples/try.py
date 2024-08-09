@@ -51,7 +51,7 @@ def reparse(filepath):
 
 Topo = dict()
 
-def mkdict(key, item):
+def mktuple(key, item):
     return (key, item)
 
 
@@ -69,9 +69,11 @@ def decode(filename, delim=':'):
     return nodes
 
 
-def decode_map(squiggle):
+def decode_mapp(squiggle):
     '''
         data specific decode intended for return by return parsing akin to line by line.
+        Expect the arg passed to be split at '{' into two parts.
+        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
     '''
     ruff = dict()
     ruff["id"] = squiggle[0].split(' ')[3].strip(':')
@@ -81,6 +83,21 @@ def decode_map(squiggle):
     dummy = alpha.split(",")[1].split(":")
     ruff[dummy[0].strip('"')] = dummy[1]
     return ruff
+
+def decode_map(squiggle):
+    '''
+        data specific decode intended for return by return parsing akin to line by line.
+        Expect the arg passed to be split at '{' into two parts.
+        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
+    '''
+    alpha = squiggle[1].strip("}")
+    dummy = alpha.split(",")[0].split(":")
+    rummy = alpha.split(",")[1].split(":")
+    sterr = [mktuple(dummy[0].strip('"'), dummy[1]),
+             mktuple(rummy[0].strip('"'), rummy[1]),
+             mktuple("id", squiggle[0].split(' ')[3].strip(':'))]
+    return dict(sterr)
+
 
 def find_name(ident, mapping):
     '''
@@ -103,7 +120,7 @@ def smersh(filename, legend, delim=':'):
     with open(filename, 'r') as spot:
         while (foo := spot.readline().strip()):
             if foo[0] != '#':
-                xoo = list(map(mkdict, legend, foo.split(delim)))
+                xoo = list(map(mktuple, legend, foo.split(delim)))
                 nodes.append(dict(xoo))
     return nodes
 
