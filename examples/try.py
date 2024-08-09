@@ -3,6 +3,7 @@
 '''
 
 import json
+import os
 import configparser
 import tomllib
 
@@ -65,6 +66,7 @@ def decode(filename, delim=':'):
             if info[0] != '#':
                 duo = info.split('{')
                 if len(duo) > 1:
+                    # print(f'duo 0 {duo[0]}, {duo[1]}')
                     nodes.append(decode_map(duo))
     return nodes
 
@@ -93,9 +95,10 @@ def find_name(ident, mapping):
         lookup an entry in the network list that matches the ident passed in.
         So, basically an address to name map
     '''
+    # print(f'Ident {ident}')
     for cache in mapping:
-        # print(f'mapping cache {cache}')
         if cache['ID'] == ident:
+            # print(f'found a mapping {cache}')
             return cache
 
 
@@ -122,9 +125,11 @@ def main():
     # [ print(f'Name {line["Name"]}, ID {line["ID"]}, GPS {line["GPS"]}') for line in network ]
     for result in decode(SIGNAL, delim='{'):
         spore = find_name(result['id'], network)
-        whole = {**spore, **result}
-        falala.append(whole)
-        print(f' Name {whole["Name"]}, SNR {whole["SNR"]}')
+        print(f'{result["id"]}  spore {spore}')
+        # print(f'--- {find_name(result['id'], network)}')
+        # whole = {**spore, **result}
+        # falala.append(whole)
+        # print(f' Name {whole["Name"]}, SNR {whole["SNR"]}')
         # print(f'== ident {result["id"]}, map {result["map"]}, SNR {result["SNR"]}')
 
     exit(0)
