@@ -69,20 +69,6 @@ def decode(filename, delim=':'):
     return nodes
 
 
-def decode_mapp(squiggle):
-    '''
-        data specific decode intended for return by return parsing akin to line by line.
-        Expect the arg passed to be split at '{' into two parts.
-        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
-    '''
-    ruff = dict()
-    ruff["id"] = squiggle[0].split(' ')[3].strip(':')
-    alpha = squiggle[1].strip("}")
-    dummy = alpha.split(",")[0].split(":")
-    ruff[dummy[0].strip('"')] = dummy[1]
-    dummy = alpha.split(",")[1].split(":")
-    ruff[dummy[0].strip('"')] = dummy[1]
-    return ruff
 
 def decode_map(squiggle):
     '''
@@ -90,9 +76,12 @@ def decode_map(squiggle):
         Expect the arg passed to be split at '{' into two parts.
         Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
     '''
+    #Split in 2 at the '{'
     alpha = squiggle[1].strip("}")
+    #split each part into two at the ':' char
     dummy = alpha.split(",")[0].split(":")
     rummy = alpha.split(",")[1].split(":")
+    # Assemble a bunch of tuples into a list that can then be turned into a dict
     sterr = [mktuple(dummy[0].strip('"'), dummy[1]),
              mktuple(rummy[0].strip('"'), rummy[1]),
              mktuple("id", squiggle[0].split(' ')[3].strip(':'))]
