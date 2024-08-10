@@ -7,6 +7,8 @@ import os
 import sys
 import configparser
 import tomllib
+from loraline import network
+import commands as cmd
 
 ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
@@ -145,4 +147,12 @@ def main():
         atchafalala[int(whole['addr'])] = whole
     [ print(f'  {x}, {atchafalala[x]["Name"]}') for x in atchafalala ]
 
-main()
+# main()
+network.gateway = 33
+get = cmd.get()
+get.From = 21
+foof = get.info(network.gateway, From=21)
+print(f'foof {foof}')
+get.From = 12
+foof = get.new_map(network.gateway, From=21)
+print(f'foof {foof}')

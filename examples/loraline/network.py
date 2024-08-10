@@ -3,10 +3,10 @@
     no matter where they're set.
 '''
 
-gateway_ = 21
+gateway = None
 
 class network():
-    def __init__(self, gateway):
+    def __init__(self):
         self._gateway_ = gateway
         self.admin_prefix = '#'
 
@@ -24,17 +24,5 @@ class network():
         self._gateway_ = value
         return
 
-@property
-def gateway():
-    '''
-        Commands are issued onto the LoRa network from one of its nodes
-        and we access the need remotely so the command has to mention
-        the source node the command is coming from.
-    '''
-    return gateway_
-
-
-@gateway.setter
-def gateway(value):
-    _gateway_ = value
-    return
+if __name__=="__main__":
+    print("=====")
