@@ -63,16 +63,23 @@ def decode(filename, delim=':'):
     nodes = list()
     with open(filename, 'r') as spot:
         while( info := spot.readline().strip()):
-            if info[0] != '#':
-                duo = info.split('{')
-                if len(duo) > 1:
-                    # print(f'duo 0 {duo[0]}, {duo[1]}')
-                    nodes.append(decode_map(duo))
+            fun = list(info)
+            if fun[0] != '#':
+                try:
+                    whence = fun.index('{')
+                    part1 = ''.join(fun[:whence]).split(' ')
+                    addr = part1[-1]
+                    part2 = ''.join(fun[whence:])
+                    part3 =json.loads(part2)
+                    nodes.append(part3)
+                except ValueError as ver:
+                    continue
+                    
     return nodes
 
 
 
-def decode_map(squiggle):
+def old_decode_map(squiggle):
     '''
         data specific decode intended for return by return parsing akin to line by line.
         Expect the arg passed to be split at '{' into two parts.
@@ -88,6 +95,15 @@ def decode_map(squiggle):
              (rummy[0].strip('"'), rummy[1]),
              ("id", squiggle[0].split(' ')[3].strip(':'))]
     return dict(sterr)
+
+def decode_map(squiggle):
+    '''
+        data specific decode intended for return by return parsing akin to line by line.
+        Expect the arg passed to be split at '{' into two parts.
+        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
+    '''
+    shoe = list(squiggle)
+    print(f'shoe[1] {shoe[1]}')
 
 
 def find_name(ident, mapping):
@@ -133,8 +149,9 @@ def main():
 
     # [ print(f'Name {line["Name"]}, ID {line["ID"]}, GPS {line["GPS"]}') for line in network ]
     for result in decode(SIGNALS, delim='{'):
-        spore = find_name(result['id'], network)
-        print(f'{result["id"]}  spore {spore}')
+        print(f'result {result}')
+        spore = find_name(result['ID'], network)
+        # print(f'{result["id"]}  spore {spore}')
         # print(f'--- {find_name(result['id'], network)}')
         # whole = {**spore, **result}
         # falala.append(whole)
