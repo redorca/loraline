@@ -151,8 +151,8 @@ def main():
 network.gateway = 33
 get = cmd.get()
 get.From = 21
-foof = get.info(network.gateway, From=21)
+foof = get.info(network.gateway)
 print(f'foof {foof}')
 get.From = 12
-foof = get.new_map(network.gateway, From=21)
+foof = get.new_map(network.gateway)
 print(f'foof {foof}')

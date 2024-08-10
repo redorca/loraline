@@ -3,15 +3,13 @@
 '''
 from loraline import network
 
-class get():
+class cmds():
     '''
-        the get command has a number of sub commands that have unique
-        generating and return processing needs to be handled here.`
+        Methods and variables universal to the commnds
     '''
     def __init__(self):
-        self.cmd_prefix = '#'
-        self.cmd = "get"
         self._From = None
+        self.cmd_prefix = '#'
         return
 
     @property
@@ -24,13 +22,23 @@ class get():
     def From(self, value):
         self._From = value
 
-    def _cmd_string(self, gateway, cmd):
-        return f"#{gateway} {self.cmd} {cmd} from {self._From}\n" 
-
-    def issue(self, gateway):
+    def issue(self, cmd):
         return
 
-    def info(self, gateway, From=None):
+    def _cmd_string(self, gateway, cmd):
+        return f"#{gateway} {self.action} {cmd} from {self._From}\n" 
+
+class get(cmds):
+    '''
+        the get command has a number of sub commands that have unique
+        generating and return processing needs to be handled here.`
+    '''
+    def __init__(self):
+        super().__init__()
+        self.action = "get"
+        return
+
+    def info(self, gateway):
         return self._cmd_string(gateway, "info")
 
     def map(self, gateway):
@@ -51,7 +59,7 @@ class get():
     def userinfo(self, gateway):
         return self._cmd_string(gateway, "userinfo")
 
-    def new_map(self, gateway, From=None):
+    def new_map(self, gateway):
         return self._cmd_string(gateway, "new map")
 
     def grpinfo(self, gateway):
