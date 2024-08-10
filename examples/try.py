@@ -9,8 +9,8 @@ import tomllib
 
 ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
-NODES    = "/tmp/nodes.txt"
-SIGNALS  = "/tmp/signals.txt"
+NODES    = "/tmp/Nodes.txt"
+SIGNALS  = "/tmp/Signals.txt"
 network = list()
 
 def toml_parse(filepath):
@@ -134,27 +134,28 @@ def smersh(filename, legend, delim=':'):
                 nodes.append(dict(xoo))
     return nodes
 
+
+def locate_files(file_list):
+    phie = list()
+    for fyy in [NODES, SIGNALS]:
+        if not os.path.exists(fyy):
+            print(f'Can\'t find {fyy}.')
+            phie.append(fyy)
+
+    return phie
+
+
 def main():
     '''
         read in a file into configparser
     '''
-    for fyy in [NODES, SIGNALS]:
-        if not os.path.exists(fyy):
-            print(f'Can\'t find {fyy}.')
-            exit(1)
-    '''
-    if not os.path.exists(NODES):
-        print(f'Can\'t find {NODES}.')
-        exit(1)
-    if not os.path.exists(SIGNALS):
-        print(f'Can\'t find {SIGNALS}.')
-        exit(1)
-    '''
+    # see if a list of missing files is returned.
+    if (yikes := locate_files([NODES, SIGNALS])) is not None : exit(1)
     atchafalala= dict()
     network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
     for result in decode(SIGNALS, delim='{'):
         spore = find_name(result['addr'], network)
         whole = {**spore, **result}
         atchafalala[int(whole['addr'])] = whole
-    [ print(f'  {x}') for x in atchafalala.keys() ]
+    # [ print(f'  {x}') for x in atchafalala.keys() ]
 main()
