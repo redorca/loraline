@@ -131,6 +131,6 @@ def main():
         spore = find_name(result['addr'], network)
         whole = {**spore, **result}
         atchafalala[int(whole['addr'])] = whole
-    # [ print(f'  {x}, {atchafalala[x]}') for x in atchafalala.keys() ]
+    [ print(f'  {x}, {atchafalala[x]["Name"]}') for x in atchafalala.keys() ]
 
 main()
