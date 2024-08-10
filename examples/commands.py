@@ -11,15 +11,13 @@ class get():
     def __init__(self):
         return
 
-
-
     def issue():
         return
 
-def main():
-    foo = lora.network(0)
-    print(f'lora.gateway {lora.gateway}')
-    print(f'lora.gateway_ {lora._gateway_}')
-
 if __name__ == "__main__":
-        main()
+    def main():
+        foo = lora.network(0)
+        print(f'lora.gateway {lora.gateway}')
+        print(f'lora.gateway_ {lora._gateway_}')
+
+    main()
