@@ -11,7 +11,7 @@ ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
 NODES    = "/tmp/nodes.txt"
 SIGNALS  = "/tmp/signals.txt"
-CONFIG   = "/etc/loraline/netmanage.conf"
+# CONFIG   = "/etc/loraline/netmanage.conf"
 
 network = list()
 
@@ -68,6 +68,10 @@ def decode(filename, delim=':'):
             fun = list(info)
             if fun[0] != '#':
                 try:
+                    '''
+                        The list.index() function doesn't return errors it raises one if
+                        the symbol is not present.
+                    '''
                     whence = fun.index('{')
                     addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
                     part2 = ''.join(fun[whence:])
@@ -80,41 +84,14 @@ def decode(filename, delim=':'):
     return nodes
 
 
-
-def old_decode_map(squiggle):
-    '''
-        data specific decode intended for return by return parsing akin to line by line.
-        Expect the arg passed to be split at '{' into two parts.
-        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
-    '''
-    #Split in 2 at the '{'
-    alpha = squiggle[1].strip("}")
-    #split each part into two at the ':' char
-    dummy = alpha.split(",")[0].split(":")
-    rummy = alpha.split(",")[1].split(":")
-    # Assemble a bunch of tuples into a list that can then be turned into a dict
-    sterr = [(dummy[0].strip('"'), dummy[1]),
-             (rummy[0].strip('"'), rummy[1]),
-             ("id", squiggle[0].split(' ')[3].strip(':'))]
-    return dict(sterr)
-
-def decode_map(squiggle):
-    '''
-        data specific decode intended for return by return parsing akin to line by line.
-        Expect the arg passed to be split at '{' into two parts.
-        Returns a dictionary mapping the "map" and "SNR" data to "map" and "SNR"
-    '''
-    shoe = list(squiggle)
-    print(f'shoe[1] {shoe[1]}')
-
-
 def find_name(ident, mapping):
     '''
         lookup an entry in the network list that matches the ident passed in.
         So, basically an address to name map
     '''
     for cache in mapping:
-        if cache['ID'].strip() == ident.strip():
+        # print(f'cache[ID] {cache["ID"]}, ident {ident}')
+        if cache['ID'] == ident:
             return cache
 
 
@@ -123,8 +100,6 @@ def smersh(filename, legend, delim=':'):
         Convert a text file of data lines into a list of dictoinaries using
         legend as the keys in the dictionary in the order to be decoded from the text line.
     '''
-    if not os.path.exists(filename):
-        return None
     nodes = list()
     with open(filename, 'r') as spot:
         while (foo := spot.readline().strip()):
@@ -156,5 +131,6 @@ def main():
         spore = find_name(result['addr'], network)
         whole = {**spore, **result}
         atchafalala[int(whole['addr'])] = whole
-    [ print(f'  {x}, {atchafalala[x]["Name"]}') for x in atchafalala.keys() ]
+    # [ print(f'  {x}, {atchafalala[x]}') for x in atchafalala.keys() ]
+
 main()
