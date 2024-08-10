@@ -73,12 +73,11 @@ def decode(filename, delim=':'):
                 try:
                     #
                     #   The list.index() function doesn't return errors it raises one if
-                    #   the symbol is not present.
+                    #   the symbol is not present. So ignore bad entries.
                     #
                     whence = fun.index('{')
                     addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
-                    part2 = ''.join(fun[whence:])
-                    part3 =json.loads(part2)
+                    part3 =json.loads(''.join(fun[whence:]))
                     part_addr = dict([ list(("addr", addr)) ])
                     nodes.append({ **part3, **part_addr})
                 except ValueError:
