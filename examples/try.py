@@ -67,11 +67,11 @@ def decode(filename, delim=':'):
             if fun[0] != '#':
                 try:
                     whence = fun.index('{')
-                    part1 = ''.join(fun[:whence]).split(' ')
-                    addr = part1[-1]
+                    addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
                     part2 = ''.join(fun[whence:])
                     part3 =json.loads(part2)
-                    nodes.append(part3)
+                    part_addr = dict([ list(("addr", addr)) ])
+                    nodes.append({ **part3, **part_addr})
                 except ValueError as ver:
                     continue
                     
@@ -113,10 +113,10 @@ def find_name(ident, mapping):
     '''
     # print(f'Ident {ident}')
     for cache in mapping:
-        if cache['ID'] == ident:
+        # print(f'{ident}, {cache["ID"]}')
+        if cache['ID'].strip() == ident.strip():
             # print(f'found a mapping {cache}')
             return cache
-
 
 
 def smersh(filename, legend, delim=':'):
@@ -138,39 +138,23 @@ def main():
     '''
         read in a file into configparser
     '''
+    for fyy in [NODES, SIGNALS]:
+        if not os.path.exists(fyy):
+            print(f'Can\'t find {fyy}.')
+            exit(1)
+    '''
     if not os.path.exists(NODES):
         print(f'Can\'t find {NODES}.')
         exit(1)
     if not os.path.exists(SIGNALS):
         print(f'Can\'t find {SIGNALS}.')
         exit(1)
-    falala = list()
+    '''
+    atchafalala= dict()
     network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
-
-    # [ print(f'Name {line["Name"]}, ID {line["ID"]}, GPS {line["GPS"]}') for line in network ]
     for result in decode(SIGNALS, delim='{'):
-        print(f'result {result}')
-        spore = find_name(result['ID'], network)
-        # print(f'{result["id"]}  spore {spore}')
-        # print(f'--- {find_name(result['id'], network)}')
-        # whole = {**spore, **result}
-        # falala.append(whole)
-        # print(f' Name {whole["Name"]}, SNR {whole["SNR"]}')
-        # print(f'== ident {result["id"]}, map {result["map"]}, SNR {result["SNR"]}')
-
-    exit(0)
-    foo = toml_parse(NACKFILE)
-    print(f'foo {foo}')
-    exit(0)
-    if (config := parse(NACKFILE)) != None:
-        print(f'parse defaults {config.defaults()}')
-        exit(0)
-    if (config := reparse(NACKFILE)) != None:
-        print(f'reparse defaults {config.defaults()}')
-        exit(0)
-    if (config :=  toml_parse(NACKFILE)) != None:
-        print(f'tomllll')
-        exit(0)
-
-
+        spore = find_name(result['addr'], network)
+        whole = {**spore, **result}
+        atchafalala[int(whole['addr'])] = whole
+    [ print(f'  {x}') for x in atchafalala.keys() ]
 main()
