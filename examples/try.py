@@ -9,8 +9,10 @@ import tomllib
 
 ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
-NODES    = "/tmp/Nodes.txt"
-SIGNALS  = "/tmp/Signals.txt"
+NODES    = "/tmp/nodes.txt"
+SIGNALS  = "/tmp/signals.txt"
+CONFIG   = "/etc/loraline/netmanage.conf"
+
 network = list()
 
 def toml_parse(filepath):
@@ -111,11 +113,8 @@ def find_name(ident, mapping):
         lookup an entry in the network list that matches the ident passed in.
         So, basically an address to name map
     '''
-    # print(f'Ident {ident}')
     for cache in mapping:
-        # print(f'{ident}, {cache["ID"]}')
         if cache['ID'].strip() == ident.strip():
-            # print(f'found a mapping {cache}')
             return cache
 
 
@@ -150,12 +149,12 @@ def main():
         read in a file into configparser
     '''
     # see if a list of missing files is returned.
-    if (yikes := locate_files([NODES, SIGNALS])) is not None : exit(1)
+    if len(yikes := locate_files([NODES, SIGNALS])) != 0: exit(1)
     atchafalala= dict()
     network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
     for result in decode(SIGNALS, delim='{'):
         spore = find_name(result['addr'], network)
         whole = {**spore, **result}
         atchafalala[int(whole['addr'])] = whole
-    # [ print(f'  {x}') for x in atchafalala.keys() ]
+    [ print(f'  {x}, {atchafalala[x]["Name"]}') for x in atchafalala.keys() ]
 main()
