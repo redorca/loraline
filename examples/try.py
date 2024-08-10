@@ -59,6 +59,21 @@ def mktuple(key, item):
     return (key, item)
 
 
+def decode_entry(fun):
+    '''
+        fun represents a return message from a command.
+
+        The list.index() function doesn't return errors it raises one if
+        the symbol is not present. So ignore bad entries.
+    '''
+    whence = fun.index('{')
+    addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
+    part3 =json.loads(''.join(fun[whence:]))
+    part_addr = dict([ list(("addr", addr)) ])
+
+    return { **part3, **part_addr}
+
+
 def decode(filename, delim=':'):
     '''
         The info file contains a set of json objects and decode ala json.dumps()
@@ -71,15 +86,7 @@ def decode(filename, delim=':'):
             fun = list(info)
             if fun[0] != '#':
                 try:
-                    #
-                    #   The list.index() function doesn't return errors it raises one if
-                    #   the symbol is not present. So ignore bad entries.
-                    #
-                    whence = fun.index('{')
-                    addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
-                    part3 =json.loads(''.join(fun[whence:]))
-                    part_addr = dict([ list(("addr", addr)) ])
-                    nodes.append({ **part3, **part_addr})
+                    nodes.append(decode_entry(fun))
                 except ValueError:
                     continue
 
