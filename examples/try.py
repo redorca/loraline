@@ -6,7 +6,6 @@ import json
 import os
 import sys
 import configparser
-import tomllib
 from loraline import network
 import commands as cmd
 
@@ -15,15 +14,6 @@ NACKFILE = "/tmp/nack"
 NODES    = "/tmp/nodes.txt"
 SIGNALS  = "/tmp/signals.txt"
 # CONFIG   = "/etc/loraline/netmanage.conf"
-
-def toml_parse(filepath):
-    '''
-        read in a file into configparser
-    '''
-    with open(filepath, 'rb', encoding='UTF8') as foop:
-        results = tomllib.load(foop)
-    return results
-
 
 def parse(filepath):
     '''
