@@ -114,13 +114,16 @@ def locate_files(file_list):
     '''
         Look for all of the given files and make sure they exist.
     '''
-    phie = []
+    missing = []
+    found = []
     for fyy in file_list:
         if not os.path.exists(fyy):
-            print(f'Can\'t find {fyy}.')
-            phie.append(fyy)
+            # print(f'Can\'t find {fyy}.')
+            missing.append(fyy)
+        else:
+            found.append(fyy)
 
-    return phie
+    return found, missing
 
 
 def main():
@@ -128,7 +131,10 @@ def main():
         read in a file into configparser
     '''
     # see if a list of missing files is returned.
-    if len(locate_files([NODES, SIGNALS])) != 0: sys.exit(1)
+    found, missing = locate_files([NODES, SIGNALS])
+    if len(missing) != 0:
+        [ print(f'Missing file: {x}') for x in missing ]
+        sys.exit(1)
     atchafalala= {}
     network = smersh(NODES, ["Name", "ID", "GPS"], delim=':')
     for result in decode(SIGNALS, delim='{'):
@@ -137,7 +143,7 @@ def main():
         atchafalala[int(whole['addr'])] = whole
     [ print(f'  {x}, {atchafalala[x]["Name"]}') for x in atchafalala ]
 
-# main()
+main()
 network.gateway = 33
 get = cmd.get()
 get.From = 21

@@ -269,7 +269,3 @@ Default target not set.
 21: Info from 108:"sleep%":100,"batVoltage":4.25,"solarVoltage":19.27}
 Connection to switchboard.loraline.net closed by remote host.
 Connection to switchboard.loraline.net closed.
-===@XXXX::wings@Wings:~
-:: 
-
-
