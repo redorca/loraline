@@ -3,6 +3,9 @@
 '''
 '''
 '''
+
+import json
+
 SRC_FILE = "./output.txt"
 Keys = ["gway", "type", "payload"]
 gway = str(21)
@@ -37,7 +40,7 @@ with open(SRC_FILE, 'r') as src:
     while (results := src.readline()):
         cmd = pkt_decode(results)
         xoo = list(map(mktuple, Keys, cmd))
-        if gway in dict(xoo):
+        if gway in results:
             print(f'xoo {dict(xoo)}')
             nodes.append(dict(xoo))
 
