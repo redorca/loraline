@@ -13,8 +13,10 @@ ACKFILE  = "/tmp/ack"
 NACKFILE = "/tmp/nack"
 NODES    = "/tmp/nodes.txt"
 SIGNALS  = "/tmp/signals.txt"
-# CONFIG   = "/etc/loraline/netmanage.conf"
+CONFIG   = "/etc/loraline/netmanage.conf"
+TEST     = './output.txt'
 
+BASE_FILES_LIST = [NODES, SIGNALS, CONFIG, TEST]
 def parse(filepath):
     '''
         read in a file into configparser
@@ -131,7 +133,8 @@ def main():
         read in a file into configparser
     '''
     # see if a list of missing files is returned.
-    found, missing = locate_files([NODES, SIGNALS])
+    # found, missing = locate_files([NODES, SIGNALS])
+    found, missing = locate_files(BASE_FILES_LIST)
     if len(missing) != 0:
         [ print(f'Missing file: {x}') for x in missing ]
         sys.exit(1)
