@@ -6,9 +6,9 @@
 
 import json
 
-SRC_FILE = "./output.txt"
+SRC_FILE = "/tmp/output.txt"
 Keys = ["gway", "type", "payload"]
-gway = str(21)
+# gway = str(21)
 
 def mktuple(key, item):
     '''
@@ -32,15 +32,20 @@ def pkt_decode(line):
         Given a return string break it down into a command dictionary and return
     '''
     fala = line.split(':', maxsplit=2)
+    print(f' line < {line} > \n=== {fala}')
     return fala
 
 
 with open(SRC_FILE, 'r') as src:
     nodes = []
-    while (results := src.readline()):
+    while (results := src.readline().strip()):
         cmd = pkt_decode(results)
-        xoo = list(map(mktuple, Keys, cmd))
-        if gway in results:
-            print(f'xoo {dict(xoo)}')
-            nodes.append(dict(xoo))
+        xoo = dict(list(map(mktuple, Keys, cmd)))
+
+        if len(cmd) == 3:
+            print(f'payload {xoo["payload"]}')
+            nodes.append(xoo)
+            # part3 = json.loads(xoo['payload'])
+            # print(f'payload {part3}')
+            exit()
 
