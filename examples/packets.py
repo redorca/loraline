@@ -65,26 +65,28 @@ with open(SRC_FILE, 'r') as src:
         xoo = dict(list(map(mktuple, Keys, cmd)))
 
         if len(cmd) == 3:
-            print(f'type {type(cmd[2])}')
+            if '}' not in cmd[2] and '{' not in cmd[2]:
+                    continue
             if not cmd[2].endswith('}'):
-                if '{' not in cmd[2]:
-                    # print(f'invalid packet {cmd[2]}')
-                    continue
                 partials.append(xoo)
+                continue
             if not cmd[2].startswith('{'):
-                if '}' not in cmd[2]:
-                    print(f'bad packet? {cmd[2]}')
-                    continue
                 for partial in partials:
                     if partial['type'] == xoo['type']:
                         total = ''.join([partial['payload'] , xoo['payload']])
-                        xoo['payload'] = total
-
-            xoo['payload'] = json.loads(xoo["payload"])
+                        partial = ''
+                        xoo['payload'] = json.loads(total)
+                        nodes.append(xoo)
+                continue
+            xoo["payload"] = json.loads(xoo["payload"])
+            # print(f'xoo {type(xoo["payload"])} {xoo["payload"]}')
+            # xoo["payload"] = json.loads(xoo["payload"])
             nodes.append(xoo)
             # part3 = json.loads(xoo['payload'])
             # print(f'payload {part3}')
 
 for x in nodes:
-    print(f'=== x: {type(x["payload"])} {x["payload"]}')
+    if "power" not in x["payload"].keys():
+        continue
+    print(f'=== x: {x["payload"]["power"]}')
 
