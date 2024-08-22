@@ -5,6 +5,7 @@
 '''
 
 import json
+import datetime as dt
 
 SRC_FILE = "/tmp/output.txt"
 Keys = ["gway", "type", "payload"]
@@ -47,15 +48,38 @@ def smersh(filename, legend, delim=':'):
     xoo = list(map(mktuple, legend, fool.split(delim)))
     return xoo
 
+def decode_timestamp(stamp):
+    '''
+        given a time string of the form [mm-dd h:m:s] convert it
+        to a date suitable for conversion to an iso format via a
+        strptime call
+    '''
+    if len(stamp) < 8:
+        return None
+
+    the_dateformat="%m-%d-%Y %H:%M:%S"
+    to_be_iso_time = stamp.split(']')
+    time_pieces = to_be_iso_time[0][1:].split(' ')
+    print(f'to_be_iso_time {to_be_iso_time}')
+    near_iso_time = '-'.join([time_pieces[0], "2024"])
+    fala = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
+    return fala
 
 def pkt_decode(line):
     '''
         Given a return string break it down into a command dictionary and return
     '''
-    fala = line.split(':', maxsplit=2)
+    if line[0] == '[' :
+        fala = decode_timestamp(line)
+    else:
+        fala = line.split(':', maxsplit=2)
+
     return fala
 
+foof = pkt_decode("[08-15 17:26:41]")
+print(f'foof {foof}')
 
+exit()
 nodes = []
 with open(SRC_FILE, 'r') as src:
     partials = []
