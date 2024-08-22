@@ -9,7 +9,6 @@ import datetime as dt
 
 SRC_FILE = "/tmp/output.txt"
 
-
 def decode_entry(fun):
     '''
         fun represents a return message from a command.
@@ -69,7 +68,7 @@ def decode_cmd_resp(msg):
     pieces = msg.split(':', maxsplit=2)
     if len(pieces) != 3:
         return None
-    Keys = ["gway", "type", "payload"]
+    Keys = ["gateway", "signature", "payload"]
     # xoo = dict(list(map(mktuple, Keys, cmd)))
     if not pieces[2].endswith('}'):
         partials.append(xoo)
@@ -111,7 +110,12 @@ with open(SRC_FILE, 'r') as src:
         # cmd = decode_entry(results)
         Keys = ["gway", "type", "payload"]
         xoo = dict(list(map(mktuple, Keys, cmd)))
-
+        # print(f':: {xoo["signature"]}')
+        if len(xoo) > 1:
+            print(f':: {len(xoo)} {xoo["signature"]}')
+        else:
+            print(f':: {len(xoo)} {xoo}')
+        continue
         if len(cmd) == 3:
             if '}' not in cmd[2] and '{' not in cmd[2]:
                     continue
@@ -120,21 +124,19 @@ with open(SRC_FILE, 'r') as src:
                 continue
             if not cmd[2].startswith('{'):
                 for partial in partials:
-                    if partial['type'] == xoo['type']:
+                    if partial['signature'] == xoo['signature']:
                         total = ''.join([partial['payload'] , xoo['payload']])
                         partial = ''
                         xoo['payload'] = json.loads(total)
                         nodes.append(xoo)
                 continue
             xoo["payload"] = json.loads(xoo["payload"])
-            # print(f'xoo {type(xoo["payload"])} {xoo["payload"]}')
+            # print(f'xoo {signature(xoo["payload"])} {xoo["payload"]}')
             # xoo["payload"] = json.loads(xoo["payload"])
             nodes.append(xoo)
             # part3 = json.loads(xoo['payload'])
             # print(f'payload {part3}')
 
 for x in nodes:
-    if "power" not in x["payload"].keys():
-        continue
-    print(f'=== x: {x["payload"]["power"]}')
+    print(f'=== x: {x["signature"]}')
 
