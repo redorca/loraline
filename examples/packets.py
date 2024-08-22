@@ -51,6 +51,7 @@ def decode_timestamp(stamp):
         to a date suitable for conversion to an iso format date object
         via a strptime call
     '''
+    Keys = ["timestamp", "msg" ]
     if len(stamp) < 8:
         return None
     the_dateformat="%m-%d-%Y %H:%M:%S"
