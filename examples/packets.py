@@ -66,21 +66,23 @@ def decode_cmd_resp(msg):
         Translate a command response string into a dictionary object
         for this node.
     '''
-    pieces = line.split(':', maxsplit=2)
-    if len(cmd) != 3:
+    pieces = msg.split(':', maxsplit=2)
+    if len(pieces) != 3:
         return None
-            if not cmd[2].endswith('}'):
-                partials.append(xoo)
-                continue
-            if not cmd[2].startswith('{'):
-                for partial in partials:
-                    if partial['type'] == xoo['type']:
-                        total = ''.join([partial['payload'] , xoo['payload']])
-                        partial = ''
-                        xoo['payload'] = json.loads(total)
-                        nodes.append(xoo)
-                continue
-            xoo["payload"] = json.loads(xoo["payload"])
+    Keys = ["gway", "type", "payload"]
+    # xoo = dict(list(map(mktuple, Keys, cmd)))
+    if not pieces[2].endswith('}'):
+        partials.append(xoo)
+        return None
+    if not pieces[2].startswith('{'):
+        for partial in partials:
+            if partial['type'] == xoo['type']:
+                total = ''.join([partial['payload'] , xoo['payload']])
+                partial = ''
+                xoo['payload'] = json.loads(total)
+                nodes.append(xoo)
+    xoo["payload"] = json.loads(xoo["payload"])
+    return xoo
 
 
 
