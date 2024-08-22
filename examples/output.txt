@@ -6,7 +6,7 @@ XXX::wings@Wings:~
 Default target not set.
 list
 Default target not set.
-21 
+21
 Default target not set.
 #21
 list
@@ -53,10 +53,10 @@ help
 21: RLOAD stn
 get grpinfo from 21
 21: Info from 21:{"stationID":21,"groupInfo":"1 2 3 4 "}
-get map 
+get map
 21: Info from 21:{"RSSI":"-83@100 -114@101 -101@102 ","SNR":"9@100 -6@101 5@102 "}
 [08-15 17:26:41] Device 32 now connected.
-get userinfo 
+get userinfo
 21: Info from 21:{"stationID":21,"name":"Marc S","address":"3200 Cavedale Rd","timezone":"PDT+7"}
 get new map from 21
 21: Unrecognized command.
@@ -79,7 +79,7 @@ get info from 25
 21: Info from 25:{"stationID":25,"model":"console","build":"2.49","upTime":"0:07:25:16","power":"USB","repeat":"off","admin":"on","auto_reboot":"on","auto_update":"off","beep":"on","currentLimit":140,"powerLevel":22,
 21: Info from 25:"tempCelsius":77.5,"sleep%":0}
 get info from 229
-get info from 29 
+get info from 29
 Connection to switchboard.loraline.net closed by remote host.
 Connection to switchboard.loraline.net closed.
 ===@XXXX::wings@Wings:~
@@ -91,7 +91,7 @@ ssh: connect to host switchboard.loraline.net port 8022: Connection refused
 ssh \$admin@switchboard.loraline.net -p 8022
 ssh: connect to host switchboard.loraline.net port 8022: Connection refused
 ===@XXXX::wings@Wings:~
-:: 
+::
 
 ================================================================================================
 
@@ -115,7 +115,7 @@ get wifi from 25
 
 send ru_on 22
 21: Unrecognized command.
-send ru_on 0 
+send ru_on 0
 21: Unrecognized command.
 send RU_ON
 21: Unrecognized command.
@@ -186,7 +186,7 @@ send RU_OK to 0
 21: ID 38 did not reply. Condition unknown.
 
 21: From 21: Internal temperature 91C above 90C
-get nwinfo 
+get nwinfo
 21: Info from 21:{"stationID":21,"network":1,"nw_version":"0.3","silenceTime":"0:00:00:16","ssid":"Elarra Wifi","wifi":"connected","ip":"192.168.0.18","ssh_url":"switchboard.loraline.net","ssh_port":8022,"ssh":"connected"}
 get nwinfo from 29
 21: Info from 29:{"stationID":29,"network":1,"nw_version":"0.3","silenceTime":"0:00:00:00","ssid":"Bella","wifi":"not connected"}
@@ -232,7 +232,7 @@ get grpinfo from 102
 21: Info from 102:{"stationID":102,"groupInfo":""}
 get grpinfo from 103
 21: Info from 103:{"stationID":103,"groupInfo":""}
-get grpinfo from 41 
+get grpinfo from 41
 Default target not set.
 #21
 get grpinfo from 41
@@ -255,7 +255,7 @@ Default target not set.
 
 #21 get grpinfo from 29
 21: Info from 29:{"stationID":29,"groupInfo":"4 10 16 "}
-#21 get info from 32   
+#21 get info from 32
 #21 get info from 38
 21: Info from 38:{"stationID":38,"model":"console","build":"2.49","upTime":"0:04:07:52","power":"USB","repeat":"off","admin":"on","auto_reboot":"on","auto_update":"off","beep":"off","currentLimit":140,"powerLevel":22,
 #21 get info from 100
@@ -270,6 +270,3 @@ Default target not set.
 Connection to switchboard.loraline.net closed by remote host.
 Connection to switchboard.loraline.net closed.
 ===@XXXX::wings@Wings:~
-:: 
-
-
