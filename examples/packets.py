@@ -8,8 +8,6 @@ import json
 import datetime as dt
 
 SRC_FILE = "/tmp/output.txt"
-Keys = ["gway", "type", "payload"]
-# gway = str(21)
 
 
 def decode_entry(fun):
@@ -51,19 +49,40 @@ def smersh(filename, legend, delim=':'):
 def decode_timestamp(stamp):
     '''
         given a time string of the form [mm-dd h:m:s] convert it
-        to a date suitable for conversion to an iso format via a
-        strptime call
+        to a date suitable for conversion to an iso format date object
+        via a strptime call
     '''
     if len(stamp) < 8:
         return None
-
     the_dateformat="%m-%d-%Y %H:%M:%S"
     to_be_iso_time = stamp.split(']')
     time_pieces = to_be_iso_time[0][1:].split(' ')
-    print(f'to_be_iso_time {to_be_iso_time}')
     near_iso_time = '-'.join([time_pieces[0], "2024"])
-    fala = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
-    return fala
+    newstamp = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
+    return "timestamp", newstamp
+
+def decode_cmd_resp(msg):
+    '''
+        Translate a command response string into a dictionary object
+        for this node.
+    '''
+    pieces = line.split(':', maxsplit=2)
+    if len(cmd) != 3:
+        return None
+            if not cmd[2].endswith('}'):
+                partials.append(xoo)
+                continue
+            if not cmd[2].startswith('{'):
+                for partial in partials:
+                    if partial['type'] == xoo['type']:
+                        total = ''.join([partial['payload'] , xoo['payload']])
+                        partial = ''
+                        xoo['payload'] = json.loads(total)
+                        nodes.append(xoo)
+                continue
+            xoo["payload"] = json.loads(xoo["payload"])
+
+
 
 def pkt_decode(line):
     '''
@@ -71,13 +90,15 @@ def pkt_decode(line):
     '''
     if line[0] == '[' :
         fala = decode_timestamp(line)
+    elif '}' in msg or '{' in msg:
+        fala = decode_cmd_resp(msg)
     else:
-        fala = line.split(':', maxsplit=2)
+            fala =  None
 
     return fala
 
 foof = pkt_decode("[08-15 17:26:41]")
-print(f'foof {foof}')
+print(f'foof {type(foof)}  {foof}')
 
 exit()
 nodes = []
@@ -86,6 +107,7 @@ with open(SRC_FILE, 'r') as src:
     while (results := src.readline().strip()):
         cmd = pkt_decode(results)
         # cmd = decode_entry(results)
+        Keys = ["gway", "type", "payload"]
         xoo = dict(list(map(mktuple, Keys, cmd)))
 
         if len(cmd) == 3:
