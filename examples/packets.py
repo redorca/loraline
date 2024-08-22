@@ -58,7 +58,7 @@ def decode_timestamp(stamp):
     time_pieces = to_be_iso_time[0][1:].split(' ')
     near_iso_time = '-'.join([time_pieces[0], "2024"])
     newstamp = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
-    return "timestamp", newstamp
+    return "timestamp", (newstamp, to_be_iso_time[1])
 
 def decode_cmd_resp(msg):
     '''
@@ -69,7 +69,7 @@ def decode_cmd_resp(msg):
     if len(pieces) != 3:
         return None
     Keys = ["gateway", "signature", "payload"]
-    # xoo = dict(list(map(mktuple, Keys, cmd)))
+    xoo = dict(list(map(mktuple, Keys, pieces)))
     if not pieces[2].endswith('}'):
         partials.append(xoo)
         return None
@@ -91,52 +91,29 @@ def pkt_decode(line):
     '''
     if line[0] == '[' :
         fala = decode_timestamp(line)
-    elif '}' in msg or '{' in msg:
-        fala = decode_cmd_resp(msg)
     else:
-            fala =  None
+        fala = None
+    # elif '}' in line or '{' in line:
+        # fala = decode_cmd_resp(line)
+        # fala =  None
+    # else:
+        fala =  None
 
     return fala
 
-foof = pkt_decode("[08-15 17:26:41]")
-print(f'foof {type(foof)}  {foof}')
+# foof = pkt_decode("[08-15 17:26:41]")
+# print(f'foof {type(foof)}  {foof}')
 
-exit()
+# exit()
 nodes = []
 with open(SRC_FILE, 'r') as src:
     partials = []
     while (results := src.readline().strip()):
         cmd = pkt_decode(results)
-        # cmd = decode_entry(results)
-        Keys = ["gway", "type", "payload"]
-        xoo = dict(list(map(mktuple, Keys, cmd)))
-        # print(f':: {xoo["signature"]}')
-        if len(xoo) > 1:
-            print(f':: {len(xoo)} {xoo["signature"]}')
-        else:
-            print(f':: {len(xoo)} {xoo}')
-        continue
-        if len(cmd) == 3:
-            if '}' not in cmd[2] and '{' not in cmd[2]:
-                    continue
-            if not cmd[2].endswith('}'):
-                partials.append(xoo)
-                continue
-            if not cmd[2].startswith('{'):
-                for partial in partials:
-                    if partial['signature'] == xoo['signature']:
-                        total = ''.join([partial['payload'] , xoo['payload']])
-                        partial = ''
-                        xoo['payload'] = json.loads(total)
-                        nodes.append(xoo)
-                continue
-            xoo["payload"] = json.loads(xoo["payload"])
-            # print(f'xoo {signature(xoo["payload"])} {xoo["payload"]}')
-            # xoo["payload"] = json.loads(xoo["payload"])
-            nodes.append(xoo)
-            # part3 = json.loads(xoo['payload'])
-            # print(f'payload {part3}')
+        if cmd is not None:
+            print(f'cmd {cmd}')
 
+exit()
 for x in nodes:
     print(f'=== x: {x["signature"]}')
 
