@@ -59,7 +59,7 @@ def decode_loglines(msg):
     msg = pieces[2].split(' ')[5:]
     message = ' '.join(pieces[2].split(' ')[5:])
     xoo = dict(list(map(mktuple, Keys, [pieces[0], pieces[1], phoo, message])))
-    return xoo
+    return xoo["gateway"], xoo
 
 def decode_timestamp(stamp):
     '''
@@ -107,25 +107,23 @@ def pkt_decode(line):
         Given a return string break it down into a command dictionary and return
     '''
     if len(line) < 3:
-        print(f'line is too short {line}')
+        print(f'line is too short [{line}]')
         return
 
     if line[0] == '[' :
         fala = decode_timestamp(line)
+    elif '}' in line or '{' in line:
+        fala = decode_cmd_resp(line)
     else:
-        fala = None
-    # elif '}' in line or '{' in line:
-        # fala = decode_cmd_resp(line)
-        # fala =  None
-    # else:
+        print(f'else {line}')
         fala =  None
 
     return fala
 
-tmp = "21: 1: Aug 15 15:50:57 2024 temperature From 21: Internal temperature 84C now below 85C"
-# decode_loglines(tmp)
-print(f'decode loglines {decode_loglines(tmp)}')
-exit()
+# tmp = "21: 1: Aug 15 15:50:57 2024 temperature From 21: Internal temperature 84C now below 85C"
+# # decode_loglines(tmp)
+# print(f'decode loglines {decode_loglines(tmp)}')
+# exit()
 nodes = []
 with open(SRC_FILE, 'r') as src:
     partials = []
