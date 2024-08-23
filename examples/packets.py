@@ -45,6 +45,22 @@ def smersh(filename, legend, delim=':'):
     xoo = list(map(mktuple, legend, fool.split(delim)))
     return xoo
 
+
+def decode_loglines(msg):
+    '''
+        Decode log entries
+    '''
+    format = "%b %d %H:%M:%S %Y"
+    Keys = ["gateway", "count", "stamp", "message"]
+    pieces = msg.split(':', maxsplit=2)
+    foof = pieces[2].strip().split(' ')[:4]
+    stamp = ' '.join(foof)
+    phoo = dt.datetime.strptime(stamp, format)
+    msg = pieces[2].split(' ')[5:]
+    message = ' '.join(pieces[2].split(' ')[5:])
+    xoo = dict(list(map(mktuple, Keys, [pieces[0], pieces[1], phoo, message])))
+    return xoo
+
 def decode_timestamp(stamp):
     '''
         given a time string of the form [mm-dd h:m:s] convert it
@@ -90,6 +106,10 @@ def pkt_decode(line):
     '''
         Given a return string break it down into a command dictionary and return
     '''
+    if len(line) < 3:
+        print(f'line is too short {line}')
+        return
+
     if line[0] == '[' :
         fala = decode_timestamp(line)
     else:
@@ -102,15 +122,15 @@ def pkt_decode(line):
 
     return fala
 
-# foof = pkt_decode("[08-15 17:26:41]")
-# print(f'foof {type(foof)}  {foof}')
-
-# exit()
+tmp = "21: 1: Aug 15 15:50:57 2024 temperature From 21: Internal temperature 84C now below 85C"
+# decode_loglines(tmp)
+print(f'decode loglines {decode_loglines(tmp)}')
+exit()
 nodes = []
 with open(SRC_FILE, 'r') as src:
     partials = []
-    while (results := src.readline().strip()):
-        cmd = pkt_decode(results)
+    while (results := src.readline()):
+        cmd = pkt_decode(results.strip())
         if cmd is not None:
             print(f'cmd {cmd}')
 
