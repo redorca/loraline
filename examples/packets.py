@@ -92,7 +92,7 @@ def decode_cmd_resp(msg):
         return None
     if not pieces[2].startswith('{'):
         for partial in partials:
-            if partial['type'] == xoo['type']:
+            if partial['signature'] == xoo['signature']:
                 total = ''.join([partial['payload'] , xoo['payload']])
                 partial = ''
                 xoo['payload'] = json.loads(total)
@@ -113,7 +113,11 @@ def pkt_decode(line):
     if line[0] == '[' :
         fala = decode_timestamp(line)
     elif '}' in line or '{' in line:
-        fala = decode_cmd_resp(line)
+        try:
+            fala = decode_cmd_resp(line)
+        except TypeError as te:
+            fala = None
+            print(f'type error {te}')
     else:
         print(f'else {line}')
         fala =  None
