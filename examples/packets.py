@@ -110,23 +110,23 @@ def decode_on_ok(line):
         cannot.
     '''
     # Split on '.' into two pieces if this is an RU_ON response.
-    pieces = line.split('.')
-    if len(pieces) == 2:
+    pieces = line.rstrip('.').split('.')
+    if len(pieces) != 2:
+        return None, None
+    print(f'+= {pieces[0]}, {pieces[1]}')
+    if "Path" in pieces[1]:
         left  = pieces[0].split(' ', maxsplit=3)
         right = pieces[1].strip().split(' ', maxsplit=2)
         Path = right[2].split(' ')
         Keys = ["ID", "condition", "Path"]
         xoo = dict(list(map(mktuple, Keys, [left[2], left[3], Path])))
         Prefix = RU_ON
-
     else:
+        # print(f'== pieces[1] {pieces[1]}')
         left = pieces[0].split(' ', maxsplit=3)
         Keys = ["ID", "response" ]
-        xoo = dict(list(map(mktuple, Keys, [left[2], left[3]])))
+        xoo = dict(list(map(mktuple, Keys, [left[2], " ".join([left[3], pieces[1]])])))
         Prefix = RU_OK
-
-    if left[1] != "ID":
-        return None, None
 
     return Prefix, xoo
 
@@ -136,21 +136,18 @@ def pkt_decode(line):
         Given a return string break it down into a command dictionary and return
     '''
     if len(line) < 3:
-        # print(f'line is too short [{line}]')
         return None, None
     station = None
     if line[0] == '[' :
         station, fala = decode_timestamp(line)
     elif '}' in line or '{' in line:
-        # print(f'elif {line}')
         try:
             station, fala = decode_cmd_resp(line)
-            # print(f'=== station {station}')
         except TypeError as te:
             fala = None
             station = None
             print(f'type error {te}')
-    elif "ID" in line:
+    elif "ID" in line and "ID" == line.split(' ', maxsplit=2)[1]:
         station, fala = decode_on_ok(line)
     else:
         # print(f'else {line}')
@@ -198,12 +195,14 @@ for item in network.keys():
             print(f'{ndx} {network[ANNOUNCE][ndx]}')
         print()
     if item == RU_ON:
+        print(f'\n============= {RU_ON} ===============')
         for element in range(0, len(network[item]), 1):
-            print(f'== == {element} {item} {network[item][element]["Path"]}')
+            print(f'{element} {item} {network[item][element]["Path"]}')
         print('-----------------------')
     if item == RU_OK:
+        print(f'\n============= {RU_OK} ===============')
         for element in range(0, len(network[item]), 1):
-            print(f'== == {element} {item} {network[item][element]}')
+            print(f'{element} {item} {network[item][element]}')
         print('-----------------------')
 
 
