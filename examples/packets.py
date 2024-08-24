@@ -75,7 +75,7 @@ def decode_timestamp(stamp):
     time_pieces = to_be_iso_time[0][1:].split(' ')
     near_iso_time = '-'.join([time_pieces[0], "2024"])
     newstamp = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
-    return "announcement", {"timestamp": (newstamp, to_be_iso_time[1])}
+    return ANNOUNCE, {"timestamp": (newstamp, to_be_iso_time[1])}
 
 def decode_cmd_resp(msg):
     '''
@@ -134,7 +134,6 @@ def pkt_decode(line):
         return None, None
     station = None
     if line[0] == '[' :
-        station = "announcement"
         station, fala = decode_timestamp(line)
     elif '}' in line or '{' in line:
         # print(f'elif {line}')
@@ -146,7 +145,6 @@ def pkt_decode(line):
             station = None
             print(f'type error {te}')
     elif "Path" in line:
-        print(f'ID in {line}')
         station, fala = decode_on_ok(line)
     else:
         # print(f'else {line}')
@@ -181,10 +179,16 @@ with open(SRC_FILE, 'r') as src:
             network[station] = cmd
         # if cmd is not None:
             # print(f'station {station}, cmd {cmd}')
-print(f'announcements {network["announcement"]}')
+
+
 for item in network.keys():
     if item is None or item == 0:
         continue
     if "payload" in network[item]:
         print(f'{item} {network[item]["payload"]}')
+    if item == ANNOUNCE:
+        print(f'\n============= {ANNOUNCE} ===============')
+        for ndx in range(0, len(network[ANNOUNCE]), 1):
+            print(f'{ndx} {network[ANNOUNCE][ndx]}')
+        print()
 exit()
