@@ -171,6 +171,15 @@ with open(SRC_FILE, 'r') as src:
     network[RU_OK] = []
 
     while (results := src.readline()):
+        if "get" == results.split(' ', maxsplit=1)[0]:
+            if "log" == results.split(' ', maxsplit=2)[1]:
+                log_for_node = int(results.split(' ', maxsplit=3)[3])
+                print(f'get logs for node {log_for_node}')
+            elif "more" == results.split(' ', maxsplit=2)[1]:
+                log_for_node = int(results.split(' ', maxsplit=4)[4])
+                print(f'get logs for node {log_for_node}')
+            continue
+
         station, cmd = pkt_decode(results.strip())
         if station == ANNOUNCE:
             network[station].append(cmd)
