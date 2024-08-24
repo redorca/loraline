@@ -113,16 +113,22 @@ def decode_on_ok(line):
     pieces = line.split('.')
     if len(pieces) == 2:
         left  = pieces[0].split(' ', maxsplit=3)
-        right = pieces[1].split(' ', maxsplit=2)
-        Path = [ right[2:] ]
+        right = pieces[1].strip().split(' ', maxsplit=2)
+        Path = right[2].split(' ')
         Keys = ["ID", "condition", "Path"]
         xoo = dict(list(map(mktuple, Keys, [left[2], left[3], Path])))
-        return RU_ON, xoo
+        Prefix = RU_ON
+
     else:
         left = pieces[0].split(' ', maxsplit=3)
         Keys = ["ID", "response" ]
         xoo = dict(list(map(mktuple, Keys, [left[2], left[3]])))
-        return RO_OK, xoo
+        Prefix = RU_OK
+
+    if left[1] != "ID":
+        return None, None
+
+    return Prefix, xoo
 
 
 def pkt_decode(line):
@@ -144,7 +150,7 @@ def pkt_decode(line):
             fala = None
             station = None
             print(f'type error {te}')
-    elif "Path" in line:
+    elif "ID" in line:
         station, fala = decode_on_ok(line)
     else:
         # print(f'else {line}')
@@ -191,4 +197,14 @@ for item in network.keys():
         for ndx in range(0, len(network[ANNOUNCE]), 1):
             print(f'{ndx} {network[ANNOUNCE][ndx]}')
         print()
+    if item == RU_ON:
+        for element in range(0, len(network[item]), 1):
+            print(f'== == {element} {item} {network[item][element]["Path"]}')
+        print('-----------------------')
+    if item == RU_OK:
+        for element in range(0, len(network[item]), 1):
+            print(f'== == {element} {item} {network[item][element]}')
+        print('-----------------------')
+
+
 exit()
