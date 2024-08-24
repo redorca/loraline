@@ -75,31 +75,54 @@ def decode_timestamp(stamp):
     time_pieces = to_be_iso_time[0][1:].split(' ')
     near_iso_time = '-'.join([time_pieces[0], "2024"])
     newstamp = dt.datetime.strptime(' '.join([near_iso_time, time_pieces[1]]), the_dateformat)
-    return "timestamp", (newstamp, to_be_iso_time[1])
+    return "announcement", {"timestamp": (newstamp, to_be_iso_time[1])}
 
 def decode_cmd_resp(msg):
     '''
         Translate a command response string into a dictionary object
         for this node.
     '''
+    station = None
     pieces = msg.split(':', maxsplit=2)
     if len(pieces) != 3:
-        return None
+        return station, None
     Keys = ["gateway", "signature", "payload"]
     xoo = dict(list(map(mktuple, Keys, pieces)))
     if not pieces[2].endswith('}'):
         partials.append(xoo)
-        return None
+        return station, None
     if not pieces[2].startswith('{'):
         for partial in partials:
             if partial['signature'] == xoo['signature']:
                 total = ''.join([partial['payload'] , xoo['payload']])
                 partial = ''
                 xoo['payload'] = json.loads(total)
-                nodes.append(xoo)
-    xoo["payload"] = json.loads(xoo["payload"])
-    return xoo
+    station = xoo['signature'].strip().split(' ')[2]
+    return station, xoo
 
+
+def decode_on_ok(line):
+    '''
+        The response to both "send RU_OK to 0" and "send RU_ON to 0" starts with
+        the signature "[0-9]*: ID". RU_ON contains 'Path' and RU_OK does not.
+
+        RUN_ON also contains a period ('.') so can be split into 2 on that and RU_OK
+        cannot.
+    '''
+    # Split on '.' into two pieces if this is an RU_ON response.
+    pieces = line.split('.')
+    if len(pieces) == 2:
+        left  = pieces[0].split(' ', maxsplit=3)
+        right = pieces[1].split(' ', maxsplit=2)
+        Path = [ right[2:] ]
+        Keys = ["ID", "condition", "Path"]
+        xoo = dict(list(map(mktuple, Keys, [left[2], left[3], Path])))
+        return RU_ON, xoo
+    else:
+        left = pieces[0].split(' ', maxsplit=3)
+        Keys = ["ID", "response" ]
+        xoo = dict(list(map(mktuple, Keys, [left[2], left[3]])))
+        return RO_OK, xoo
 
 
 def pkt_decode(line):
@@ -107,36 +130,61 @@ def pkt_decode(line):
         Given a return string break it down into a command dictionary and return
     '''
     if len(line) < 3:
-        print(f'line is too short [{line}]')
-        return
-
+        # print(f'line is too short [{line}]')
+        return None, None
+    station = None
     if line[0] == '[' :
-        fala = decode_timestamp(line)
+        station = "announcement"
+        station, fala = decode_timestamp(line)
     elif '}' in line or '{' in line:
+        # print(f'elif {line}')
         try:
-            fala = decode_cmd_resp(line)
+            station, fala = decode_cmd_resp(line)
+            # print(f'=== station {station}')
         except TypeError as te:
             fala = None
+            station = None
             print(f'type error {te}')
+    elif "Path" in line:
+        print(f'ID in {line}')
+        station, fala = decode_on_ok(line)
     else:
-        print(f'else {line}')
+        # print(f'else {line}')
+        station = None
         fala =  None
 
-    return fala
+    return station, fala
 
 # tmp = "21: 1: Aug 15 15:50:57 2024 temperature From 21: Internal temperature 84C now below 85C"
 # # decode_loglines(tmp)
 # print(f'decode loglines {decode_loglines(tmp)}')
 # exit()
-nodes = []
+network = {}
+RU_ON = "RU_ON"
+RU_OK = "RU_OK"
+ANNOUNCE = "announcements"
 with open(SRC_FILE, 'r') as src:
     partials = []
+    network[ANNOUNCE] = []
+    network[RU_ON] = []
+    network[RU_OK] = []
+
     while (results := src.readline()):
-        cmd = pkt_decode(results.strip())
-        if cmd is not None:
-            print(f'cmd {cmd}')
-
+        station, cmd = pkt_decode(results.strip())
+        if station == ANNOUNCE:
+            network[station].append(cmd)
+        elif station == RU_ON:
+            network[RU_ON].append(cmd)
+        elif station == RU_OK:
+            network[RU_OK].append(cmd)
+        else:
+            network[station] = cmd
+        # if cmd is not None:
+            # print(f'station {station}, cmd {cmd}')
+print(f'announcements {network["announcement"]}')
+for item in network.keys():
+    if item is None or item == 0:
+        continue
+    if "payload" in network[item]:
+        print(f'{item} {network[item]["payload"]}')
 exit()
-for x in nodes:
-    print(f'=== x: {x["signature"]}')
-
