@@ -9,6 +9,15 @@ import datetime as dt
 
 SRC_FILE = "/tmp/output.txt"
 
+
+def mktuple(key, item):
+    '''
+        Build and return a set of the args that the caller
+        can then process into a dictionary
+    '''
+    return (key, item)
+
+
 def decode_entry(fun):
     '''
         fun represents a return message from a command.
@@ -28,38 +37,6 @@ def decode_entry(fun):
     exit()
     return results
 
-
-def mktuple(key, item):
-    '''
-        Build and return a set of the args that the caller
-        can then process into a dictionary
-    '''
-    return (key, item)
-
-
-def smersh(filename, legend, delim=':'):
-    '''
-        Convert a text file of data lines into a list of dictoinaries using
-        legend as the keys in the dictionary in the order to be decoded from the text line.
-    '''
-    xoo = list(map(mktuple, legend, fool.split(delim)))
-    return xoo
-
-
-def decode_loglines(msg):
-    '''
-        Decode log entries
-    '''
-    format = "%b %d %H:%M:%S %Y"
-    Keys = ["gateway", "count", "stamp", "message"]
-    pieces = msg.split(':', maxsplit=2)
-    foof = pieces[2].strip().split(' ')[:4]
-    stamp = ' '.join(foof)
-    phoo = dt.datetime.strptime(stamp, format)
-    msg = pieces[2].split(' ')[5:]
-    message = ' '.join(pieces[2].split(' ')[5:])
-    xoo = dict(list(map(mktuple, Keys, [pieces[0], pieces[1], phoo, message])))
-    return xoo["gateway"], xoo
 
 def decode_timestamp(stamp):
     '''
@@ -113,7 +90,6 @@ def decode_on_ok(line):
     pieces = line.rstrip('.').split('.')
     if len(pieces) != 2:
         return None, None
-    print(f'+= {pieces[0]}, {pieces[1]}')
     if "Path" in pieces[1]:
         left  = pieces[0].split(' ', maxsplit=3)
         right = pieces[1].strip().split(' ', maxsplit=2)
@@ -131,88 +107,159 @@ def decode_on_ok(line):
     return Prefix, xoo
 
 
+def decode_loglines(line):
+    '''
+        Decode further responses of the form "21:  7: xxxxxx" or "21: 8 xxxxx" into log entries,
+        wifi network entries, and log details (e.g. 5 of 8 entries)
+    '''
+    station = None
+    xoo = None
+    '''
+        This little dance strips out any  '>' embedded in the string between the
+        log entry ordinal and the date-time stamp. This makes generically splitting
+        the string on ':' will always separate the data-time string from the offset. 
+    '''
+    tmp  = line.split('>', maxsplit=2)
+    log_ndx = ' '.join(tmp).split(':', maxsplit=2)
+    if len(log_ndx) > 2:
+        the_dateformat="%b %d %H:%M:%S %Y"
+        Keys = ["count", "stamp", MSG]
+        log_ndx[2] = log_ndx[2][1:]
+        pieces = log_ndx[2].split(' ', maxsplit=4)
+        timestr = ' '.join(pieces[0:4])
+        message = ' '.join(pieces[4:])
+        try:
+            timestamp  = dt.datetime.strptime(timestr, the_dateformat)
+            xoo = dict(list(map(mktuple, Keys, [log_ndx[1], timestamp, message])))
+            station = LOGS
+        except ValueError as vle:
+            '''
+                May be a response to a "get wifi" command. The response is of the form
+                "node_#, network_#, SSID, signal_strength, channel_#". SSID may be more
+                thant a single word; it may contain spaces.
+            '''
+            Keys = ["#", "SSID", "dB", "channel"]
+            msg = log_ndx[2].split(',')
+            xoo = dict(list(map(mktuple, Keys,
+            [log_ndx[1], msg[0], msg[1].strip(" ").split(" ")[0], msg[2].strip(" ").split(" ")[1]])))
+            station = WIFI
+    else:
+        '''
+            Likely an initial response to a "get log from xx" command which details
+            how many log entries are on the node and what offset into that array of
+            log entries the next 9 logs correspond to.
+        '''
+        xoo = {}
+
+    return station, xoo
+
+
+def decode_system(line):
+    '''
+        Capture messages a node emits spontaneously
+    '''
+    station = None
+    xoo = None
+    pieces = line.split(' ', maxsplit=2)
+    if len(pieces) > 2:
+        # station pieces[2].split(':')[0]
+        station = LOGS
+        msg = pieces[2].split(':')[1]
+        node = pieces[2].split(':')[0]
+        if pieces[1] == "found":
+            node = ""
+            msg = pieces[2]
+        Keys = [ pieces[1], MSG]
+        xoo = dict(list(map(mktuple, Keys, [node, msg])))
+    return station, xoo
+
+global log_node, wifi_node 
+log_node = "0"
+wifi_node = "0"
 def pkt_decode(line):
     '''
         Given a return string break it down into a command dictionary and return
     '''
-    if len(line) < 3:
+    filter_0 = {"Info": decode_cmd_resp, "ID": decode_on_ok, "From": decode_system, "found": decode_system}
+    pieces = line.strip().split(' ', maxsplit=3)
+    if len(pieces) < 3:
         return None, None
     station = None
-    if line[0] == '[' :
+    fala = None
+    begins = pieces[0].strip("#:")
+    if begins == "21":
+        # print(f"shell line: {line}, {len(pieces)}")
+        fala = None
+        if len(pieces) > 2 and pieces[1] in filter_0:
+            station, fala = filter_0[pieces[1]](line)
+        elif len(pieces) > 2 and pieces[1].split('>')[0].strip(':').isdigit():
+            station, fala = decode_loglines(line)
+    elif begins.startswith('['):
         station, fala = decode_timestamp(line)
-    elif '}' in line or '{' in line:
-        try:
-            station, fala = decode_cmd_resp(line)
-        except TypeError as te:
-            fala = None
-            station = None
-            print(f'type error {te}')
-    elif "ID" in line and "ID" == line.split(' ', maxsplit=2)[1]:
-        station, fala = decode_on_ok(line)
     else:
         # print(f'else {line}')
         station = None
-        fala =  None
 
     return station, fala
 
-# tmp = "21: 1: Aug 15 15:50:57 2024 temperature From 21: Internal temperature 84C now below 85C"
-# # decode_loglines(tmp)
-# print(f'decode loglines {decode_loglines(tmp)}')
-# exit()
+
 network = {}
+WIFI = "Wifi"
+LOGS  = "Logs"
 RU_ON = "RU_ON"
 RU_OK = "RU_OK"
+MSG = "Message"
 ANNOUNCE = "announcements"
+CATEGORIES = [ANNOUNCE, RU_ON, RU_OK, LOGS, WIFI]
 with open(SRC_FILE, 'r') as src:
     partials = []
     network[ANNOUNCE] = []
+    network[WIFI] = []
+    network[LOGS] = []
     network[RU_ON] = []
     network[RU_OK] = []
 
     while (results := src.readline()):
-        if "get" == results.split(' ', maxsplit=1)[0]:
-            if "log" == results.split(' ', maxsplit=2)[1]:
-                log_for_node = int(results.split(' ', maxsplit=3)[3])
-                print(f'get logs for node {log_for_node}')
-            elif "more" == results.split(' ', maxsplit=2)[1]:
-                log_for_node = int(results.split(' ', maxsplit=4)[4])
-                print(f'get logs for node {log_for_node}')
-            continue
-
+        '''
+        '''
         station, cmd = pkt_decode(results.strip())
-        if station == ANNOUNCE:
+        if station is None or cmd is None:
+            continue
+        if station in CATEGORIES and not cmd is None:
             network[station].append(cmd)
-        elif station == RU_ON:
-            network[RU_ON].append(cmd)
-        elif station == RU_OK:
-            network[RU_OK].append(cmd)
         else:
             network[station] = cmd
-        # if cmd is not None:
-            # print(f'station {station}, cmd {cmd}')
-
 
 for item in network.keys():
     if item is None or item == 0:
         continue
     if "payload" in network[item]:
         print(f'{item} {network[item]["payload"]}')
-    if item == ANNOUNCE:
+    elif item == ANNOUNCE:
         print(f'\n============= {ANNOUNCE} ===============')
         for ndx in range(0, len(network[ANNOUNCE]), 1):
             print(f'{ndx} {network[ANNOUNCE][ndx]}')
         print()
-    if item == RU_ON:
+    elif item == RU_ON:
         print(f'\n============= {RU_ON} ===============')
         for element in range(0, len(network[item]), 1):
             print(f'{element} {item} {network[item][element]["Path"]}')
         print('-----------------------')
-    if item == RU_OK:
+    elif item == RU_OK:
         print(f'\n============= {RU_OK} ===============')
         for element in range(0, len(network[item]), 1):
             print(f'{element} {item} {network[item][element]}')
         print('-----------------------')
-
-
-exit()
+    elif item == WIFI:
+        print('=================== {WIFI} ====================')
+        for wifi in network[item]:
+            print(  f'{wifi}')
+        print('-----------------------')
+    elif item == LOGS:
+        print('=================== {LOGS} ====================')
+        for logg in network[item]:
+            if MSG in logg.keys():
+                print(f'== {logg[MSG]}')
+            else:
+                print(f'....{network[item]}')
+        print('-----------------------')
