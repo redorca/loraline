@@ -65,7 +65,7 @@ def decode_cmd_resp(msg):
     if len(pieces) != 3:
         return station, None
     Keys = ["gateway", "signature", "payload"]
-    xoo = dict(list(map(mktuple, Keys, pieces)))
+    xoo = dict(list(map(mktuple, Keys, [x.strip() for x in pieces])))
     if not pieces[2].endswith('}'):
         partials.append(xoo)
         return station, None
@@ -76,6 +76,8 @@ def decode_cmd_resp(msg):
                 partial = ''
                 xoo['payload'] = json.loads(total)
     station = xoo['signature'].strip().split(' ')[2]
+    # print(f'SIGNATURE station {station} >>{xoo["signature"]}<<')
+    # print(f'SIGNATURE {msg}')
     return station, xoo
 
 
@@ -189,7 +191,6 @@ def pkt_decode(line):
     fala = None
     begins = pieces[0].strip("#:")
     if begins == "21":
-        # print(f"shell line: {line}, {len(pieces)}")
         fala = None
         if len(pieces) > 2 and pieces[1] in filter_0:
             station, fala = filter_0[pieces[1]](line)
@@ -239,4 +240,3 @@ with open(SRC_FILE, 'r') as src:
 
 
 dn.dump_net(network)
-
