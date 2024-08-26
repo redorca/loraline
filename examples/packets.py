@@ -6,6 +6,7 @@
 
 import json
 import datetime as dt
+import dump_net as dn
 
 SRC_FILE = "/tmp/output.txt"
 
@@ -204,11 +205,14 @@ def pkt_decode(line):
 
 
 network = {}
+META="Meta"
 WIFI = "Wifi"
 LOGS  = "Logs"
 RU_ON = "RU_ON"
 RU_OK = "RU_OK"
 MSG = "Message"
+LOG_FROM="Logged From"
+WIFI_LOG="Wifi Log For"
 ANNOUNCE = "announcements"
 CATEGORIES = [ANNOUNCE, RU_ON, RU_OK, LOGS, WIFI]
 with open(SRC_FILE, 'r') as src:
@@ -218,6 +222,9 @@ with open(SRC_FILE, 'r') as src:
     network[LOGS] = []
     network[RU_ON] = []
     network[RU_OK] = []
+    network[META] = {}
+    network[META][LOG_FROM] = ""
+    network[META][WIFI_LOG] = ""
 
     while (results := src.readline()):
         '''
@@ -230,36 +237,6 @@ with open(SRC_FILE, 'r') as src:
         else:
             network[station] = cmd
 
-for item in network.keys():
-    if item is None or item == 0:
-        continue
-    if "payload" in network[item]:
-        print(f'{item} {network[item]["payload"]}')
-    elif item == ANNOUNCE:
-        print(f'\n============= {ANNOUNCE} ===============')
-        for ndx in range(0, len(network[ANNOUNCE]), 1):
-            print(f'{ndx} {network[ANNOUNCE][ndx]}')
-        print()
-    elif item == RU_ON:
-        print(f'\n============= {RU_ON} ===============')
-        for element in range(0, len(network[item]), 1):
-            print(f'{element} {item} {network[item][element]["Path"]}')
-        print('-----------------------')
-    elif item == RU_OK:
-        print(f'\n============= {RU_OK} ===============')
-        for element in range(0, len(network[item]), 1):
-            print(f'{element} {item} {network[item][element]}')
-        print('-----------------------')
-    elif item == WIFI:
-        print('=================== {WIFI} ====================')
-        for wifi in network[item]:
-            print(  f'{wifi}')
-        print('-----------------------')
-    elif item == LOGS:
-        print('=================== {LOGS} ====================')
-        for logg in network[item]:
-            if MSG in logg.keys():
-                print(f'== {logg[MSG]}')
-            else:
-                print(f'....{network[item]}')
-        print('-----------------------')
+
+dn.dump_net(network)
+
