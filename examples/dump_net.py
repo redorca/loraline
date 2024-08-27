@@ -22,12 +22,11 @@ def dump_net(network):
         elif type(network[item]) == type(list_ref):
             print(f"found a list: {network[item]}")
         '''
-
+        print(f'---> {item}')
         if type(network[item]) == type(dict_ref):
             print(f'\n============= {item} ===============')
             for entry in network[item].keys():
                 print(f':: [{item}]{[entry]} {network[item][entry]}')
-            continue
         elif type(network[item]) == type(list_ref):
             print(f'\n============= {item} ===============')
             for ndx in range(0, len(network[item]), 1):

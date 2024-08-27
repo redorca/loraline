@@ -64,20 +64,21 @@ def decode_cmd_resp(msg):
     pieces = msg.split(':', maxsplit=2)
     if len(pieces) != 3:
         return station, None
-    Keys = ["gateway", "signature", "payload"]
-    xoo = dict(list(map(mktuple, Keys, [x.strip() for x in pieces])))
-    if not pieces[2].endswith('}'):
-        partials.append(xoo)
-        return station, None
-    if not pieces[2].startswith('{'):
-        for partial in partials:
-            if partial['signature'] == xoo['signature']:
-                total = ''.join([partial['payload'] , xoo['payload']])
-                partial = ''
-                xoo['payload'] = json.loads(total)
-    station = xoo['signature'].strip().split(' ')[2]
-    # print(f'SIGNATURE station {station} >>{xoo["signature"]}<<')
-    # print(f'SIGNATURE {msg}')
+    if pieces[2].endswith(','):
+        built = ''.join([pieces[2].rstrip(','), '}'])
+    elif not pieces[2].startswith('{'):
+        built = ''.join(['{', pieces[2]])
+    else:
+        built = pieces[2]
+    xoo = {}
+    xoo["gateway"] = pieces[0].strip()
+    xoo["signature"] = pieces[1].strip()
+    station = xoo["signature"].split(' ')[2]
+    xoo["payload"] = json.loads(built)
+    if "stationID" not in xoo["payload"]:
+        xoo["payload"]["stationID"] = station
+    print(f'station {station} payload {xoo["payload"]}')
+    # station = xoo["payload"]["stationID"]
     return station, xoo
 
 
@@ -236,7 +237,11 @@ with open(SRC_FILE, 'r') as src:
         if station in CATEGORIES and not cmd is None:
             network[station].append(cmd)
         else:
-            network[station] = cmd
+            # results = { **part3, **part_addr}
+            print(f'station {station}')
+            if station not in network:
+                network[station] = {}
+            network[station] = {**network[station], **cmd}
 
 
 dn.dump_net(network)
