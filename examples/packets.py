@@ -56,7 +56,6 @@ def decode_cmd_resp(msg):
     xoo["payload"] = json.loads(built)
     if "stationID" not in xoo["payload"]:
         xoo["payload"]["stationID"] = station
-
     return station, xoo
 
 
@@ -216,10 +215,11 @@ if __name__ == "__main__":
                 else:
                     if station not in network:
                         network[station] = { "gateway": "", "signature": "", "payload": dict()}
-                        if "payload" in network[station]:
-                            foof = network[station]["payload"]
-                            cmd["payload"].update(foof)
-                            network[station].update(cmd)
+
+                    if "payload" in network[station]:
+                        foof = network[station]["payload"]
+                        cmd["payload"].update(foof)
+                        network[station].update(cmd)
 
         dodump = dn.Dump(network, CATEGORIES)
         # dodump.dump_filter( ["power", "upTime", "batVoltage", "model"])
