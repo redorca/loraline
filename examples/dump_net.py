@@ -14,15 +14,6 @@ def dump_net(network):
     for item in network.keys():
         if item is None or item == 0:
             continue
-        '''
-        if type(network[item]) == type(dict_ref):
-            print(f"found a dict: {network[item]}")
-        elif type(network[item]) == type(str_ref):
-            print(f"found a str: {network[item]}")
-        elif type(network[item]) == type(list_ref):
-            print(f"found a list: {network[item]}")
-        '''
-        print(f'---> {item}')
         if type(network[item]) == type(dict_ref):
             print(f'\n============= {item} ===============')
             for entry in network[item].keys():

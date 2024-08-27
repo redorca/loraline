@@ -19,26 +19,6 @@ def mktuple(key, item):
     return (key, item)
 
 
-def decode_entry(fun):
-    '''
-        fun represents a return message from a command.
-
-        The list.index() function doesn't return errors it raises one if
-        the symbol is not present. So ignore bad entries.
-    '''
-    whence = fun.index('{')
-    addr =  ''.join(fun[:whence]).split(' ')[-1].strip(':')
-    part3 =''.join(fun[whence:])
-    breakout = json.loads(part3)
-    print(f'breakout {len(breakout)} {breakout["stationID"]}')
-    part_addr = dict([ list(("addr", addr)) ])
-
-    # results = { **part3, **part_addr}
-    # print(f'results {results}')
-    exit()
-    return results
-
-
 def decode_timestamp(stamp):
     '''
         given a time string of the form [mm-dd h:m:s] convert it
@@ -60,7 +40,7 @@ def decode_cmd_resp(msg):
         Translate a command response string into a dictionary object
         for this node.
     '''
-    station = None
+    xoo = {}
     pieces = msg.split(':', maxsplit=2)
     if len(pieces) != 3:
         return station, None
@@ -70,15 +50,13 @@ def decode_cmd_resp(msg):
         built = ''.join(['{', pieces[2]])
     else:
         built = pieces[2]
-    xoo = {}
     xoo["gateway"] = pieces[0].strip()
     xoo["signature"] = pieces[1].strip()
     station = xoo["signature"].split(' ')[2]
     xoo["payload"] = json.loads(built)
     if "stationID" not in xoo["payload"]:
         xoo["payload"]["stationID"] = station
-    print(f'station {station} payload {xoo["payload"]}')
-    # station = xoo["payload"]["stationID"]
+
     return station, xoo
 
 
@@ -102,7 +80,6 @@ def decode_on_ok(line):
         xoo = dict(list(map(mktuple, Keys, [left[2], left[3], Path])))
         Prefix = RU_ON
     else:
-        # print(f'== pieces[1] {pieces[1]}')
         left = pieces[0].split(' ', maxsplit=3)
         Keys = ["ID", "response" ]
         xoo = dict(list(map(mktuple, Keys, [left[2], " ".join([left[3], pieces[1]])])))
@@ -200,7 +177,6 @@ def pkt_decode(line):
     elif begins.startswith('['):
         station, fala = decode_timestamp(line)
     else:
-        # print(f'else {line}')
         station = None
 
     return station, fala
@@ -237,8 +213,6 @@ with open(SRC_FILE, 'r') as src:
         if station in CATEGORIES and not cmd is None:
             network[station].append(cmd)
         else:
-            # results = { **part3, **part_addr}
-            print(f'station {station}')
             if station not in network:
                 network[station] = {}
             network[station] = {**network[station], **cmd}
