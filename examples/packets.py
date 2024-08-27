@@ -222,7 +222,6 @@ if __name__ == "__main__":
                         network[station].update(cmd)
 
         dodump = dn.Dump(network, CATEGORIES)
-        # dodump.dump_filter( ["power", "upTime", "batVoltage", "model"])
-        dodump.dump_nodes()
+        dodump.dump_filter( ["power", "RSSI", "batVoltage", "model"])
 
     main()
