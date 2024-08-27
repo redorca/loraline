@@ -2,9 +2,6 @@
     A collection of introspection methods to reveal inner workings
 '''
 
-str_ref = "string"
-dict_ref = {}
-list_ref = []
 
 class Dump():
     '''
@@ -16,6 +13,9 @@ class Dump():
         self.foo = "foo"
         self.network = network
         self.Keys = Keys
+        self.str_ref = "string"
+        self.dict_ref = {}
+        self.list_ref = []
 
     def dump_nodes(self):
         '''
@@ -54,11 +54,11 @@ class Dump():
         for item in self.network.keys():
             if item is None or item == 0:
                 continue
-            if type(self.network[item]) == type(dict_ref):
+            if type(self.network[item]) == type(self.dict_ref):
                 print(f'\n============= {item} ===============')
                 for entry in self.network[item].keys():
                     print(f':: [{item}]{[entry]} {self.network[item][entry]}')
-            elif type(self.network[item]) == type(list_ref):
+            elif type(self.network[item]) == type(self.list_ref):
                 print(f'\n============= {item} ===============')
                 for ndx in range(0, len(self.network[item]), 1):
                     print(f'({ndx}) {self.network[item][ndx]}')
