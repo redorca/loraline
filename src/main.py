@@ -37,8 +37,8 @@ async def run_tasks(ahost, aport, q_cmds, q_returns, connxion):
         tg.create_task(service(ahost, aport))
         tg.create_task(bouy())
         # Create the ssh command pipes
-        tg.create_task(connxion.run(q_cmds, q_returns))
-
+        tasks = tg.create_task(connxion.run(q_cmds, q_returns))
+        await asyncio.gather(tasks)
     return
 
 async def bouy():
