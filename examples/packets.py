@@ -214,8 +214,11 @@ with open(SRC_FILE, 'r') as src:
             network[station].append(cmd)
         else:
             if station not in network:
-                network[station] = {}
-            network[station] = {**network[station], **cmd}
-
+                print(f'Create node {station}')
+                network[station] = { "gateway": "", "signature": "", "payload": dict()}
+            if "payload" in network[station]:
+                foof = network[station]["payload"]
+                cmd["payload"].update(foof)
+            network[station].update(cmd)
 
 dn.dump_net(network)
