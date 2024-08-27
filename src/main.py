@@ -34,11 +34,11 @@ async def service(addr, port):
 async def run_tasks(ahost, aport, q_cmds, q_returns, connxion):
     async with asyncio.TaskGroup() as tg:
         # Create the local cli listener
-        tg.create_task(service(ahost, aport))
-        tg.create_task(bouy())
+        tasks.append(tg.create_task(service(ahost, aport)))
+        tasks.append(tg.create_task(bouy()))
         # Create the ssh command pipes
-        tasks = tg.create_task(connxion.run(q_cmds, q_returns))
-        await asyncio.gather(tasks)
+        tasks = tasks.append(tg.create_task(connxion.run(q_cmds, q_returns)))
+        await asyncio.gather(*tasks)
     return
 
 async def bouy():
