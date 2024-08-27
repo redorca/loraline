@@ -98,7 +98,7 @@ def decode_loglines(line):
     '''
         This little dance strips out any  '>' embedded in the string between the
         log entry ordinal and the date-time stamp. This makes generically splitting
-        the string on ':' will always separate the data-time string from the offset. 
+        the string on ':' will always separate the data-time string from the offset.
     '''
     tmp  = line.split('>', maxsplit=2)
     log_ndx = ' '.join(tmp).split(':', maxsplit=2)
@@ -154,7 +154,7 @@ def decode_system(line):
         xoo = dict(list(map(mktuple, Keys, [node, msg])))
     return station, xoo
 
-global log_node, wifi_node 
+global log_node, wifi_node
 log_node = "0"
 wifi_node = "0"
 def pkt_decode(line):
@@ -192,33 +192,37 @@ MSG = "Message"
 LOG_FROM="Logged From"
 WIFI_LOG="Wifi Log For"
 ANNOUNCE = "announcements"
-CATEGORIES = [ANNOUNCE, RU_ON, RU_OK, LOGS, WIFI]
-with open(SRC_FILE, 'r') as src:
-    partials = []
-    network[ANNOUNCE] = []
-    network[WIFI] = []
-    network[LOGS] = []
-    network[RU_ON] = []
-    network[RU_OK] = []
-    network[META] = {}
-    network[META][LOG_FROM] = ""
-    network[META][WIFI_LOG] = ""
+CATEGORIES = [ANNOUNCE, RU_ON, RU_OK, LOGS, WIFI, META]
+if __name__ == "__main__":
+    def main():
+        with open(SRC_FILE, 'r') as src:
+            partials = []
+            network[ANNOUNCE] = []
+            network[WIFI] = []
+            network[LOGS] = []
+            network[RU_ON] = []
+            network[RU_OK] = []
+            network[META] = {}
+            network[META][LOG_FROM] = ""
+            network[META][WIFI_LOG] = ""
+            while (results := src.readline()):
+                '''
+                '''
+                station, cmd = pkt_decode(results.strip())
+                if station is None or cmd is None:
+                    continue
+                if station in CATEGORIES and not cmd is None:
+                    network[station].append(cmd)
+                else:
+                    if station not in network:
+                        network[station] = { "gateway": "", "signature": "", "payload": dict()}
+                        if "payload" in network[station]:
+                            foof = network[station]["payload"]
+                            cmd["payload"].update(foof)
+                            network[station].update(cmd)
 
-    while (results := src.readline()):
-        '''
-        '''
-        station, cmd = pkt_decode(results.strip())
-        if station is None or cmd is None:
-            continue
-        if station in CATEGORIES and not cmd is None:
-            network[station].append(cmd)
-        else:
-            if station not in network:
-                print(f'Create node {station}')
-                network[station] = { "gateway": "", "signature": "", "payload": dict()}
-            if "payload" in network[station]:
-                foof = network[station]["payload"]
-                cmd["payload"].update(foof)
-            network[station].update(cmd)
+        dodump = dn.Dump(network, CATEGORIES)
+        # dodump.dump_filter( ["power", "upTime", "batVoltage", "model"])
+        dodump.dump_nodes()
 
-dn.dump_net(network)
+    main()
