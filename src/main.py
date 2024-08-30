@@ -4,6 +4,7 @@
 
 import os
 from loglady import logg
+import logging
 import asyncio
 import connections as conn
 from collections import deque
@@ -24,6 +25,8 @@ async def do_cmd(StreamReader, StreamWriter):
     '''
     data = await StreamReader.read(300)
     process_q.append(str(data))
+    logging.warning(data)
+    StreamWriter.write(data)
     StreamWriter.write(b'done')
 
 async def service(addr, port):
@@ -39,7 +42,7 @@ async def run_tasks(ahost, aport, q_cmds, q_returns, connxion):
         tasks.append(tg.create_task(service(ahost, aport)))
         tasks.append(tg.create_task(buoy()))
         # Create the ssh command pipes
-        # tasks.append(tg.create_task(connxion.run(q_cmds, q_returns)))
+        tasks.append(tg.create_task(connxion.run(q_cmds, q_returns)))
         await asyncio.gather(*tasks)
     return
 
