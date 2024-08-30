@@ -55,8 +55,10 @@ if __name__ == "__main__":
             print('  No commands passed in, now\'s the time to exit')
             raise ValueError
 
-        host, port = await initialize.get_params(region)
-        uri = await initialize.build_uri(host, port, "ssh", "rock", "lobster")
+        # host, port = await initialize.get_params(region)
+        params = await initialize.get_params(region)
+        uri = await initialize.build_uri(params["daemon"]["Host"], params["daemon"]["Port"],
+                                         , "ssh", "rock", "lobster")
         client, connection = await connect(uri)
         if type(client) is None:
             print(f'error error error: No connection made.')
