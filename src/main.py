@@ -2,6 +2,7 @@
     Create tasks including a listener socket for receiving cmds from the CLI
 '''
 
+import os
 from loglady import logg
 import asyncio
 import connections as conn
@@ -53,14 +54,23 @@ async def main():
     '''
     region = 'local'
     protocol = "ssh"
-    user = "wings"
-    pword = "mccartney"
-    # uri = await initialize.build_uri(host, port, protocol, user, pword)
-    host, port = await initialize.get_params(region)
+    user = os.getenv("TARGET_USER")
+    pword = os.getenv("TARGET_PASS")
+    if user is None or pword is None:
+        print(' user or password, or both, are invalid.')
+        print(' Please set TARGET_USER to desired user,')
+        print(' and TARGET_PASS to the password.')
+        exit(1)
+    params = await initialize.get_params(region)
+    host = params["connect"]["Host"]
+    port = params["connect"]["Port"]
     uri = await initialize.build_uri(host, port, protocol, user, pword)
     remote = conn.Connection(uri)
     await remote.debug_on(2)
     await remote.connect()
-    await run_tasks(host, port, process_q, results_q, remote)
+    daemon_host = params["daemon"]["Host"]
+    daemon_port = params["daemon"]["Port"]
+
+    await run_tasks(daemon_host, daemon_port, process_q, results_q, remote)
 
 asyncio.run(main())
