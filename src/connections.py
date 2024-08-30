@@ -73,6 +73,7 @@ class Connection():
         logging.basicConfig()
         asyncssh.set_log_level('DEBUG')
         asyncssh.set_debug_level(level)
+        logging.warn("logging set")
 
     async def issue(self, cmd):
         '''
@@ -98,7 +99,7 @@ class Connection():
                 await asyncio.sleep(2)
             do_it = cmds_q.popleft()
             # whole = str()
-            channelW, channelR, channelEr = self.connection.open_session(command=cmd)
+            channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
             # returned = await self.issue(self, do_it)
             buff = await channelR.readline()
             while channelR.at_eof() is False:
