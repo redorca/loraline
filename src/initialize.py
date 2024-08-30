@@ -39,7 +39,7 @@ async def get_params(region):
     configs = parse.ConfigParser(allow_no_value=True)
     configs.read(Config_file)
     entries = configs.options("network")
-    print(f'=== entries {entries}')
+    # print(f'=== entries {entries}')
     Keywords = ["Port", "Host"]
     want = map(mktuple, Keywords, [configs.get("network", x) for x in entries if x.split('.')[0] == region])
     entries = configs.options("daemon")
