@@ -4,6 +4,7 @@
 
 import asyncio, asyncssh, sys
 from collections import deque
+import logging
 
 class Connection():
     '''
@@ -53,7 +54,6 @@ class Connection():
             Run an ssh connection agent and return the connection. An SSHClientConnection object
             is returned against which sessions may be created or opened
         '''
-
         if len(addr.split(':')) != 2:
             print(f'=== bad address provided: {addr}')
             raise ValueError
@@ -66,6 +66,13 @@ class Connection():
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
         self.state = 'open'
         return self.connection
+
+    async def debug_on(self, level):
+        '''
+        '''
+        logging.basicConfig()
+        asyncssh.set_log_level('DEBUG')
+        asyncssh.set_debug_level(level)
 
     async def issue(self, cmd):
         '''

@@ -88,7 +88,7 @@ async def main():
         port = 8022; server = 'switchboard.saal.org'; key_path = 'C:/Users/'+os.getlogin()
     else:      # suppose we are linux
         # port = 8022; server = 'localhost'; key_path = '/home/' + os.getlogin()
-        port = 8022; server = 'localhost'; key_path = os.getenv('HOME')
+        port = 22; server = 'localhost'; key_path = os.getenv('HOME')
     os.chdir(key_path + '/OTA' )
     asyncssh.set_log_level(logging.DEBUG)
     asyncssh.set_debug_level(3)
