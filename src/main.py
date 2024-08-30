@@ -24,6 +24,8 @@ async def do_cmd(StreamReader, StreamWriter):
         a command pipe will process.
     '''
     data = await StreamReader.read(300)
+    if data == b'exit':
+        exit()
     process_q.append(str(data))
     logging.warning(data)
     StreamWriter.write(data)
