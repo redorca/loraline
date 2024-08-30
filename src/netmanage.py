@@ -33,18 +33,33 @@ def client(host, port, cmd):
         blog.info(f'returned data {data}')
 
 async def main():
+    '''
+    '''
     # connect_type = 'remote'
     connect_type = 'local'
-    if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
-        print(f"This command '{sys.argv[1]}' is unrecognized.")
-        return
-    if len(sys.argv) > 2 and not sys.argv[2] in commands.lora_cmds[sys.argv[1]]:
-        print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
-        return
+    try:
+        if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
+            print(f"This command '{sys.argv[1]}' is unrecognized.")
+            # return
+        if len(sys.argv) > 2 and not sys.argv[2] in commands.lora_cmds[sys.argv[1]]:
+            print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
+            # return
+    except KeyError as keye:
+        print(f'{keye}')
+
     cmd_string = ' '.join(sys.argv[1:])
     print(f'cmd string:: {cmd_string}')
-    host, port = await initialize.get_params(connect_type)
-    if connect_type is "remote":
+    # host, port = await initialize.get_params(connect_type)
+    params = await initialize.get_params(connect_type)
+    host = params["daemon"]["Host"]
+    port = params["daemon"]["Port"]
+    try:
+        client(host, port, bytes(cmd_string.encode('UTF8')))
+    except ConnectionRefusedError as cre:
+        print('The request handling service may not be running.')
+        print(f'== {cre}')
+    exit()
+    if connect_type == "remote":
         client(host, port, bytes(cmd_string.encode('UTF8')))
     else:
         client(host, port, bytes('ls -l'.encode('UTF8')))
