@@ -73,7 +73,7 @@ class Connection():
         logging.basicConfig()
         asyncssh.set_log_level('DEBUG')
         asyncssh.set_debug_level(level)
-        logging.warn("logging set")
+        logging.warning("logging set")
 
     async def issue(self, cmd):
         '''
@@ -98,6 +98,7 @@ class Connection():
             while len(cmds_q) == 0:
                 await asyncio.sleep(2)
             do_it = cmds_q.popleft()
+            logging.warning(f"do_it {do_it}")
             # whole = str()
             channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
             # returned = await self.issue(self, do_it)
@@ -105,10 +106,14 @@ class Connection():
             while channelR.at_eof() is False:
                 # whole += buff
                 buff += await channelR.readline()
+                buff += await channelEr.readline()
             # whole += buff
             # results_q.append(whole)
+            # logging.warning(f"::== <{buff}>")
             results_q.append(buff)
+            logging.warning("\t ===")
             await self.close_connection()
+            logging.warning(f"::== <{buff}>")
 
     async def make_channel(self, cmd):
         '''
@@ -118,7 +123,5 @@ class Connection():
         return await self.connection.open_session(command=cmd)
 
     async def close_connection(self):
-        if self.state is open:
-            await  self.connection.wait_closed()
-            return
+        await  self.connection.wait_closed()
 
