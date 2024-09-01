@@ -94,22 +94,33 @@ class Connection():
         return whole
 
     async def run(self, cmds_q, results_q):
-        while True:
-            logging.warning("=== :: Check the queue for pending commands.")
-            do_it = await cmds_q.get()
-            # logging.warning(f"=== got it {type(do_it)}")
-            # args = do_it.split(' ')
-            args = [ "ls", "/" ]
-            logging.warning(f"--- Process command >{args}")
-            self.connection.logger.set_log_level('DEBUG')
-            Completion = await self.connection.run("ls", check=True, timeout=2)
-            logging.warning(f"--- Read the channel {buff}")
-            buff = Completion.stdout()
-            try:
-                # results_q.put_nowait(buff)
-                results_q.put(buff)
-            except asyncio.QueueFull as aqf:
-                logging.warning(f'{aqf}')
+        async with self.connection.create_process("bash") as cpr:
+            while True:
+                logging.warning("=== :: Check the queue for pending commands.")
+                do_it = await cmds_q.get()
+                # logging.warning(f"=== got it {type(do_it)}")
+                # args = do_it.split(' ')
+                args = [ "ls", "/" ]
+                logging.warning(f"--- Process command >{args}<")
+                # self.connection.logger.set_log_level('DEBUG')
+                # Completion = await self.connection.run("ls", check=True, timeout=2)
+                logging.warning("--- Write the command into stdin")
+                cpr.stdin.write('ls /home \n')
+                # buff = await cpr.stdout.readline()
+                buff = str()
+                logging.warninig("--- Read the output")
+                while cpr.stdout.at_eof() is False:
+                    logging.warning(f"--- Read the channel >{len(buff)} bytes<")
+                    buff += await cpr.stdout.readline()
+
+                logging.warning("--- put to Q")
+                try:
+                    # results_q.put_nowait(buff)
+                    results_q.put(buff)
+                    logging.warning(f'--- results put on Q')
+                except asyncio.QueueFull as aqf:
+                    logging.warning(f'#############################################')
+                    logging.warning(f'{aqf}')
 
     async def make_channel(self, cmd):
         '''
