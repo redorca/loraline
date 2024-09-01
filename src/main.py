@@ -7,7 +7,6 @@ from loglady import logg
 import logging
 import asyncio
 import connections as conn
-from collections import deque
 import platform
 import configparser as parse
 import initialize
@@ -15,21 +14,20 @@ import initialize
 
 # blog = logg.DasLog()
 # blog.info(f'blogging level is {blog.get_level()}')
-process_q = deque()
-results_q = deque()
+process_q = asyncio.Queue()
+results_q = asyncio.Queue()
 
 async def do_cmd(StreamReader, StreamWriter):
     '''
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
+    logging.warning("==::==")
     data = await StreamReader.read(300)
-    if data == b'exit':
-        exit()
-    process_q.append(str(data))
-    logging.warning(data)
+    process_q.put_nowait(str(data))
+    # logging.warning(f'== data {type(data)} {data}')
     StreamWriter.write(data)
-    StreamWriter.write(b'done')
+    StreamWriter.write(b'\n================ done')
 
 async def service(addr, port):
     server = await asyncio.start_server(do_cmd, addr, port)
