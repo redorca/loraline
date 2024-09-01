@@ -3,7 +3,6 @@
 '''
 
 import asyncio, asyncssh, sys
-from collections import deque
 import logging
 
 class Connection():
@@ -64,6 +63,7 @@ class Connection():
         self.username = addr.split(':')[1].split(',')[1]
         self.password = addr.split(':')[1].split(',')[2]
         self.connection = await asyncssh.connect(self.target, port=self.port, username=self.username, password=self.password)
+        # logging.warning(f'++++ ssh_connect {type(self.connection)}')
         self.state = 'open'
         return self.connection
 
@@ -73,7 +73,7 @@ class Connection():
         logging.basicConfig()
         asyncssh.set_log_level('DEBUG')
         asyncssh.set_debug_level(level)
-        logging.warn("logging set")
+        # logging.warning("logging set")
 
     async def issue(self, cmd):
         '''
@@ -95,20 +95,21 @@ class Connection():
 
     async def run(self, cmds_q, results_q):
         while True:
-            while len(cmds_q) == 0:
-                await asyncio.sleep(2)
-            do_it = cmds_q.popleft()
-            # whole = str()
-            channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
-            # returned = await self.issue(self, do_it)
-            buff = await channelR.readline()
-            while channelR.at_eof() is False:
-                # whole += buff
-                buff += await channelR.readline()
-            # whole += buff
-            # results_q.append(whole)
-            results_q.append(buff)
-            await self.close_connection()
+            logging.warning("=== :: Check the queue for pending commands.")
+            do_it = await cmds_q.get()
+            # logging.warning(f"=== got it {type(do_it)}")
+            # args = do_it.split(' ')
+            args = [ "ls", "/" ]
+            logging.warning(f"--- Process command >{args}")
+            self.connection.logger.set_log_level('DEBUG')
+            Completion = await self.connection.run("ls", check=True, timeout=2)
+            logging.warning(f"--- Read the channel {buff}")
+            buff = Completion.stdout()
+            try:
+                # results_q.put_nowait(buff)
+                results_q.put(buff)
+            except asyncio.QueueFull as aqf:
+                logging.warning(f'{aqf}')
 
     async def make_channel(self, cmd):
         '''
@@ -117,8 +118,12 @@ class Connection():
         '''
         return await self.connection.open_session(command=cmd)
 
-    async def close_connection(self):
+    async def close_connectionn(self):
         if self.state is open:
             await  self.connection.wait_closed()
             return
+
+    async def close_connection(self):
+        self.connection.close()
+        await  self.connection.wait_closed()
 
