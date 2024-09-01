@@ -22,11 +22,13 @@ async def do_cmd(StreamReader, StreamWriter):
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
-    logging.warning("==::==")
+    logging.warning(f"== {process_q.qsize()} ==")
     data = await StreamReader.read(300)
     process_q.put_nowait(str(data))
     # logging.warning(f'== data {type(data)} {data}')
     StreamWriter.write(data)
+    buff = await results_q.get()
+    StreamWriter.write(buff)
     StreamWriter.write(b'\n================ done')
 
 async def service(addr, port):
