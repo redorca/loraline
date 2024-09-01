@@ -72,7 +72,7 @@ async def main():
     uri = await initialize.build_uri(host, port, protocol, user, pword)
     remote = conn.Connection(uri)
     await remote.debug_on(2)
-    await remote.connect()
+    # await remote.connect()
     daemon_host = params["daemon"]["Host"]
     daemon_port = params["daemon"]["Port"]
 
