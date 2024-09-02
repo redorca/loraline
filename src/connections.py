@@ -97,22 +97,19 @@ class Connection():
             while True:
                 logging.warning("=== :: Check the queue for pending commands.")
                 do_it = await cmds_q.get()
-                # command = ' '.join(["#21", do_it, '\n'])
-                Command = ''.join([do_it, '\n'])
-                logging.warning(f"--- Write the command >>{command}<< into stdin")
-                channelW, channelR, channelEr = await self.connection.open_session(command=Command)
+                logging.warning(f"--- Write the command {type(do_it)} >>{do_it}<< into stdin")
+                channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
                 # back = await channelW.write(Command.encode("UTF8"))
                 # logging.warning(f'back {back}')
                 buff = await channelR.readline()
-                logging.warning(f"--- results {buff}")
-                # while channelR.at_eof() is False:
-                    # buff += await channelR.readline()
-                    # buff += await channelEr.readline()
+                ebuff = await channelEr.readline()
+                while channelR.at_eof() is False:
+                    buff += await channelR.readline()
+                    ebuff += await channelEr.readline()
 
                 try:
-                    # await channelW.close()
-                    results_q.put(buff)
-                    # results_q.put_nowait(buff)
+                    logging.warning(f"--- Results >>{buff}::, >>{ebuff}::")
+                    await results_q.put(buff.encode('UTF8'))
                 except asyncio.QueueFull as aqf:
                     logging.warning(f'#############################################')
                     logging.warning(f'{aqf}')

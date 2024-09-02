@@ -24,8 +24,8 @@ async def do_cmd(StreamReader, StreamWriter):
     '''
     logging.warning(f"== {process_q.qsize()} ==")
     data = await StreamReader.read(300)
-    process_q.put_nowait(str(data))
-    # logging.warning(f'== data {type(data)} {data}')
+    process_q.put_nowait(data.decode('UTF8'))
+    logging.warning(f'== data {type(data)} {data}')
     StreamWriter.write(data)
     buff = await results_q.get()
     StreamWriter.write(buff)
