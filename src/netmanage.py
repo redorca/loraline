@@ -29,26 +29,33 @@ def client(host, port, cmd):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.connect((host, int(port)))
         sock.send(cmd)
-        data = sock.recv(512)
-        blog.info(f'returned data {data}')
+        buff = sock.recv(512)
+        #
+        # Throw away first line because it's the shell echoing back the command
+        buff = b""
+        while len(data := sock.recv(512)) == 512:
+            buff += data.strip()
+            # print(f'length of data {len(data)}')
+        buff += data.strip()
+        print(f'{buff.decode("UTF8")}')
 
 async def main():
     '''
     '''
     # connect_type = 'remote'
     connect_type = 'local'
-    try:
-        if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
-            print(f"This command '{sys.argv[1]}' is unrecognized.")
-            # return
-        if len(sys.argv) > 2 and not sys.argv[2] in commands.lora_cmds[sys.argv[1]]:
-            print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
-            # return
-    except KeyError as keye:
-        print(f'{keye}')
+    # try:
+        # if len(sys.argv) > 1 and not sys.argv[1] in commands.lora_cmds:
+            # print(f"This command '{sys.argv[1]}' is unrecognized.")
+            # # return
+        # if len(sys.argv) > 2 and not sys.argv[2] in commands.lora_cmds[sys.argv[1]]:
+            # print(f'Incorrect subcommand \"{sys.argv[2]}\" of {sys.argv[1]}')
+            # # return
+    # except KeyError as keye:
+        # print(f'{keye}')
 
     cmd_string = ' '.join(sys.argv[1:])
-    print(f'cmd string:: {cmd_string}')
+    # print(f'cmd string:: {cmd_string}')
     # host, port = await initialize.get_params(connect_type)
     params = await initialize.get_params(connect_type)
     host = params["daemon"]["Host"]
