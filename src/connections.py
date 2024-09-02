@@ -98,15 +98,18 @@ class Connection():
             while len(cmds_q) == 0:
                 await asyncio.sleep(2)
             do_it = cmds_q.popleft()
+            logging.warning(f'=== type(do_it) {type(do_it)}')
             # whole = str()
             channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
             # returned = await self.issue(self, do_it)
             buff = await channelR.readline()
+            buff += await channelEr.readline()
             while channelR.at_eof() is False:
                 # whole += buff
                 buff += await channelR.readline()
             # whole += buff
             # results_q.append(whole)
+            logging.warning(f"buff {buff}")
             results_q.append(buff)
             await self.close_connection()
 

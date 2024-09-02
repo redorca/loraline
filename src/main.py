@@ -24,9 +24,10 @@ async def do_cmd(StreamReader, StreamWriter):
         a command pipe will process.
     '''
     data = await StreamReader.read(300)
-    process_q.append(str(data))
-    logging.warning(data)
-    StreamWriter.write(data)
+    cmd = data.decode('UTF8')
+    process_q.append(cmd)
+    logging.warning(f'type(cmd) {type(cmd)} cmd {cmd}')
+    StreamWriter.write(cmd.encode('UTF8'))
     StreamWriter.write(b'done')
 
 async def service(addr, port):
