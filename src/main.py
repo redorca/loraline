@@ -22,10 +22,10 @@ async def do_cmd(StreamReader, StreamWriter):
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
-    logging.warning(f"== {process_q.qsize()} ==")
+    # logging.warning(f"== {process_q.qsize()} ==")
     data = await StreamReader.read(300)
     process_q.put_nowait(data.decode('UTF8'))
-    logging.warning(f'== data {type(data)} {data}')
+    # logging.warning(f'== data {type(data)} {data}')
     StreamWriter.write(data)
     buff = await results_q.get()
     StreamWriter.write(buff)
@@ -50,7 +50,7 @@ async def run_tasks(ahost, aport, q_cmds, q_returns, connxion):
 async def buoy():
     while True:
         await asyncio.sleep(5)
-        print(",,,,,,")
+        # logging.warning(",,,,,,")
 
 async def main():
     '''
@@ -70,7 +70,7 @@ async def main():
     port = params["connect"]["Port"]
     uri = await initialize.build_uri(host, port, protocol, user, pword)
     remote = conn.Connection(uri)
-    await remote.debug_on(2)
+    # await remote.debug_on(2)
     await remote.connect()
     daemon_host = params["daemon"]["Host"]
     daemon_port = params["daemon"]["Port"]

@@ -73,7 +73,6 @@ class Connection():
         logging.basicConfig()
         asyncssh.set_log_level('DEBUG')
         asyncssh.set_debug_level(level)
-        # logging.warning("logging set")
 
     async def issue(self, cmd):
         '''
@@ -95,9 +94,9 @@ class Connection():
 
     async def run(self, cmds_q, results_q):
             while True:
-                logging.warning("=== :: Check the queue for pending commands.")
+                # logging.warning("=== :: Check the queue for pending commands.")
                 do_it = await cmds_q.get()
-                logging.warning(f"--- Write the command {type(do_it)} >>{do_it}<< into stdin")
+                # logging.warning(f"--- Write the command {type(do_it)} >>{do_it}<< into stdin")
                 channelW, channelR, channelEr = await self.connection.open_session(command=do_it)
                 # back = await channelW.write(Command.encode("UTF8"))
                 # logging.warning(f'back {back}')

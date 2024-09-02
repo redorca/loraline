@@ -10,6 +10,7 @@
 '''
 import asyncio
 import configparser as parse
+import logging
 
 Config_file = "/etc/loraline/netmanage.conf"
 
@@ -25,7 +26,7 @@ def mktuple(key, item):
 async def build_uri(host, port, protocol, user, password):
     elements = ":".join([protocol, ''.join(["//", host]), port])
     uri = ",".join([elements, user, password])
-    print(f'returning uri {uri}')
+    logging.info(f'returning uri {uri}')
     return uri
 
 
