@@ -11,6 +11,5 @@ Homepage:
 Package: loraline-netmanage
 Architecture: any
 Depends: python3
-
-Description: Provides a way to cleanup what was installed.
-
+Breaks: loraline-netmanage
+Description: Manage access to a loraline network and monitoring of the network.
