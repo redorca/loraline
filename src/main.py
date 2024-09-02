@@ -29,7 +29,6 @@ async def do_cmd(StreamReader, StreamWriter):
     StreamWriter.write(data)
     buff = await results_q.get()
     StreamWriter.write(buff)
-    StreamWriter.write(b'\n================ done')
 
 async def service(addr, port):
     server = await asyncio.start_server(do_cmd, addr, port)

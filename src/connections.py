@@ -108,7 +108,6 @@ class Connection():
                     ebuff += await channelEr.readline()
 
                 try:
-                    logging.warning(f"--- Results >>{buff}::, >>{ebuff}::")
                     await results_q.put(buff.encode('UTF8'))
                 except asyncio.QueueFull as aqf:
                     logging.warning(f'#############################################')
