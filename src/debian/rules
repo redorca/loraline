@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-PACKAGE = loranet-netmanage
+PACKAGE = loraline-netmanage
 VERSION = 1.1-1
 BUILD_DIR=${PACKAGE}-${VERSION}
 SERVICES = netmanage.servvice
@@ -11,7 +11,13 @@ clean:
 
 build::
 	@mkdir -p debian/${PACKAGE}
-	@cp -a boot/ lib/ usr/ debian/${PACKAGE}
+	@mkdir -p debian/${PACKAGE}/opt
+	@cp -a etc/  debian/${PACKAGE}
+	@cp  lib/systemd/system/netmanage.service debian/${PACKAGE}.service
+	@cp  lib/systemd/system/netmanage.socket debian/${PACKAGE}.socket
+	@find ../ ! -type d -name "*.py" > /tmp/foo
+	@tar -T /tmp/foo -zcf /tmp/bar.tgz && tar -C  ${PACKAGE}/opt/${PACKAGE} -zxf /tmp/bar.tgz
+
 binary:
 	dh_installdeb
 	dh_gencontrol

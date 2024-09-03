@@ -25,5 +25,4 @@ ExecReload=/usr/bin/python3 /usr/bin/netmanage.py
 # NotifyAccess=main
 
 [Install]
-WantedBy=multi-user.target
 Also=netmanage.socket
