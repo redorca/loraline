@@ -28,6 +28,8 @@ setup: ${BUILDDIR}
 		rm -rf $${target} ; \
 		done
 
+build:
+	debuild -i -us -uc -b
 
 systemd: ${SYSTEMDIR}
 	@cp lib/systemd/system/netmanage.s* debin/

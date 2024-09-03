@@ -10,13 +10,12 @@ clean:
 	@${RM} ../*.deb ../*.buildinfo ../*.changlogs
 
 build::
-	@mkdir -p debian/${PACKAGE}
-	@mkdir -p debian/${PACKAGE}/opt
+	@mkdir -p debian/${PACKAGE}/opt/${PACKAGE}
 	@cp -a etc/  debian/${PACKAGE}
 	@cp  lib/systemd/system/netmanage.service debian/${PACKAGE}.service
 	@cp  lib/systemd/system/netmanage.socket debian/${PACKAGE}.socket
 	@find ../ ! -type d -name "*.py" > /tmp/foo
-	@tar -T /tmp/foo -zcf /tmp/bar.tgz && tar -C  ${PACKAGE}/opt/${PACKAGE} -zxf /tmp/bar.tgz
+	@tar -T /tmp/foo -zcf /tmp/bar.tgz && tar -C  debian/${PACKAGE}/opt/${PACKAGE} -zxf /tmp/bar.tgz
 
 binary:
 	dh_installdeb
