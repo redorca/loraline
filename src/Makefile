@@ -32,7 +32,7 @@ build:
 	debuild -i -us -uc -b
 
 systemd: ${SYSTEMDIR}
-	@cp lib/systemd/system/netmanage.s* debin/
+	@cp lib/systemd/system/netmanage.s* debian/
 
 config: ${CONFIGDIR}
 	@cp etc/loraline/netmanage.conf debian/
@@ -41,6 +41,7 @@ rooted: ${CONFIGDIR:%=/%}
 	@sudo cp ${CONFIGDIR}/${CONFFILE} $^
 
 cleandeb:
-	@${RM} -r ${BUILDDIR}
+	${RM} -r debian/${PACKAGE}
 
 clean: cleandeb
+	${RM} ../${PACKAGE}*
