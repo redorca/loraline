@@ -9,6 +9,8 @@ clean:
 	@dh_clean
 	@${RM} ../*.deb ../*.buildinfo ../*.changlogs
 
+%:
+	@ dh $@
 build::
 	@mkdir -p debian/${PACKAGE}/opt/${PACKAGE}
 	@cp -a etc/  debian/${PACKAGE}
@@ -17,8 +19,8 @@ build::
 	@find ../ ! -type d -name "*.py" > /tmp/foo
 	@tar -T /tmp/foo -zcf /tmp/bar.tgz && tar -C  debian/${PACKAGE}/opt/${PACKAGE} -zxf /tmp/bar.tgz
 
-binary:
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-	dh_fixperms
+# binary:
+# 	dh_installdeb
+# 	dh_gencontrol
+# 	dh_builddeb
+# 	dh_fixperms
