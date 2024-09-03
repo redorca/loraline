@@ -1,47 +1,66 @@
-#
-# Copyright (C) 2024, Bill Rees, all rights reserved.
-#
+#############################################################################
+#                                                                           #
+#        Copyright (C) 2019, Bill Rees                                      #
+#                                                                           #
+#                                                                           #
+#                                                                           #
+#                                                                           #
+#############################################################################
 
 PACKAGE = loraline-netmanage
-VERSION = 1.1-1
-BUILDDIR =  ${PACKAGE}_${VERSION}
-CONFIGDIR = etc/loraline/
-SYSTEMDIR = lib/systemd/system/
-UNITFILES = ${PACKAGE}.service ${PACKAGE}.socket
-CONFFILE  = netmanage.conf
-SOURCES = cmds tests connections.py debian
+PKG_VER = 1.1-1
+#
+# DESTDIR points to the root directory
+#
+# DESTDIR?=debian/$(PACKAGE)
+DESTDIR ?= $(PACKAGE)
 
-MKDIR = mkdir -p
+INSTALL_PATH = $(DESTDIR)$(TARGETDIR)
+Q=@
 RM = rm -f
-CP = cp
+RMR = $(RM) -r
+CP = cp -a
+MKDIR = mkdir -p
 
-${SYSTEMDIR} ${CONFIGDIR} ${BUILDDIR}:
-	@${MKDIR} $@
+all:
+	$(Q) echo "====================="
 
-setup: ${BUILDDIR}
-	@for name in ${SOURCES} ; do \
-		${CP} -a $${name} ${BUILDDIR} ;\
-	done
-	@find ${BUILDDIR} -name .gitignore -exec rm {} \;
-	@for target in $$(find ${BUILDDIR} -name __pycache__ -type d) ; do \
-		echo "target $${target}" ;\
-		rm -rf $${target} ; \
-		done
+changelog:
+	$(Q) echo "$(PACKAGE) ($(PKG_VER)) UNRELEASED; urgency=medium" > fupu
+	$(Q) echo "\n\n * Initial release\n" >> fupu
+	$(Q) echo "\t-- bill <bill@zglue.com>  Sat, 04 May 2019 23:28:32 -0700" >> fupu
+ 
 
-build:
-	debuild -i -us -uc -b
+install: package fixup
+	@echo "===================================="
 
-systemd: ${SYSTEMDIR}
-	@cp lib/systemd/system/netmanage.s* debian/
+package: Foo=$(PACKAGE:gcc-%=%)
+package: $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE)
+	$(Q) $(CP) etc/ $(DESTDIR)
+	$(Q) $(CP) ../loglady cmds/ $(DESTDIR)/opt/${PACKAGE}
+	$(Q) $(CP) *.py $(DESTDIR)/opt/${PACKAGE}
+	$(Q) $(CP) debian/ $(DESTDIR)
+	$(Q) $(CP) debian/Makefile $(DESTDIR)
 
-config: ${CONFIGDIR}
-	@cp etc/loraline/netmanage.conf debian/
+fixup:
+	$(Q) find $(DESTDIR) -name .gitignore -exec $(RM) {} \;
 
-rooted: ${CONFIGDIR:%=/%}
-	@sudo cp ${CONFIGDIR}/${CONFFILE} $^
+doc-fix:
+	$(Q) for pdf in $$(find $(INSTALL_PATH)/share/doc -name "*.pdf") ; do   \
+		gzip $$pdf  ; \
+	     done
+	$(Q) 
+	$(Q) 
 
-cleandeb:
-	${RM} -r debian/${PACKAGE}
+$(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE):
+	$(Q) [ -d $@ ] || $(MKDIR) $@
 
-clean: cleandeb
-	${RM} ../${PACKAGE}*
+
+clean:
+	$(Q) $(RMR) $(DESTDIR)
+	$(Q) $(RM) $(PACKAGE)_$(PKG_VER).* $(PACKAGE)_$(PKG_VER)_*
+
+clobber: clean
+	$(Q) cd ${DESTDIR%debian*}debian/ && $(RM) -r debhelper-build-stamp gcc-arm-none-eabi.substvars files .debhelper
+
+

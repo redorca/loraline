@@ -12,29 +12,21 @@ PKG_VER = 1.1-1
 #
 # DESTDIR points to the root directory
 #
-DESTDIR?=debian/$(PACKAGE)
-FULLNAME = $(shell pwd)
-BASE_NAME = $(shell basename $(FULLNAME)
-DEB_VER = $(BASE_NAME:$(PACKAGE)-%=%)
-
-ROOT_DIRS = etc lib opt
-# TARGETDIR=.$(PACKAGE)/usr
-# TARGETDIR = $(shell echo "$(PACKAGE:gcc-%=%)" )
-#
-# TARGETDIR points to the directory to copy files
-# into.
-#
-TARGETDIR = /usr
+# DESTDIR?=debian/$(PACKAGE)
+DESTDIR ?= $(PACKAGE)
 
 INSTALL_PATH = $(DESTDIR)$(TARGETDIR)
-SOURCEDIR=gcc-arm-none-eabi
 Q=@
+RM = rm -f
+RMR = $(RM) -r
+CP = cp -a
+MKDIR = mkdir -p
 
 all:
 	$(Q) echo "====================="
 
 changelog:
-	$(Q) echo "$(PACKAGE) ($(DEB_VER)) UNRELEASED; urgency=medium" > fupu
+	$(Q) echo "$(PACKAGE) ($(PKG_VER)) UNRELEASED; urgency=medium" > fupu
 	$(Q) echo "\n\n * Initial release\n" >> fupu
 	$(Q) echo "\t-- bill <bill@zglue.com>  Sat, 04 May 2019 23:28:32 -0700" >> fupu
  
@@ -44,10 +36,9 @@ install: package doc-fix
 
 package: Foo=$(PACKAGE:gcc-%=%)
 package: $(DESTDIR)$(TARGETDIR)
-	$(Q) for dir in $(ROOT_DIRS) ; do \
-		[ -d  $(INSTALL_PATH)/$$dir/${Foo} ] || mkdir -p $(INSTALL_PATH)/$$dir/${Foo}  ; \
-		cp -a ${Foo}/$$dir/* ${INSTALL_PATH}/$${dir}/${Foo} ;       \
-	     done
+	$(Q) $(CP) etc/ $(DESTDIR)
+	$(Q) $(CP) debian/ $(DESTDIR)
+	$(Q) $(CP) debian/Makefile $(DESTDIR)
 
 doc-fix:
 	$(Q) for pdf in $$(find $(INSTALL_PATH)/share/doc -name "*.pdf") ; do   \
@@ -57,7 +48,7 @@ doc-fix:
 	$(Q) 
 
 $(DESTDIR)$(TARGETDIR):
-	$(Q) [ -d $@ ] || mkdir -p $@
+	$(Q) [ -d $@ ] || $(MKDIR) $@
 
 
 clean:
