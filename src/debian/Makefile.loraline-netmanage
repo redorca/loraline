@@ -17,7 +17,7 @@ FULLNAME = $(shell pwd)
 BASE_NAME = $(shell basename $(FULLNAME)
 DEB_VER = $(BASE_NAME:$(PACKAGE)-%=%)
 
-ROOT_DIRS = bin lib include share
+ROOT_DIRS = etc lib opt
 # TARGETDIR=.$(PACKAGE)/usr
 # TARGETDIR = $(shell echo "$(PACKAGE:gcc-%=%)" )
 #
@@ -34,16 +34,16 @@ all:
 	$(Q) echo "====================="
 
 changelog:
-	$(Q) echo "$(PACKAGE) ($(DEB_VER)) phoo; urgency=medium" > fupu
-	$(Q) echo "\n\n * Initial release (Closes: \043899095)\n" >> fupu
+	$(Q) echo "$(PACKAGE) ($(DEB_VER)) UNRELEASED; urgency=medium" > fupu
+	$(Q) echo "\n\n * Initial release\n" >> fupu
 	$(Q) echo "\t-- bill <bill@zglue.com>  Sat, 04 May 2019 23:28:32 -0700" >> fupu
  
 
 install: package doc-fix
+	@echo "===================================="
 
 package: Foo=$(PACKAGE:gcc-%=%)
 package: $(DESTDIR)$(TARGETDIR)
-	$(Q) cp -a lib share bin $(INSTALL_PATH) ; $(RM) $(INSTALL_PATH)/share/doc/gcc-arm-none-eabi/info/dir
 	$(Q) for dir in $(ROOT_DIRS) ; do \
 		[ -d  $(INSTALL_PATH)/$$dir/${Foo} ] || mkdir -p $(INSTALL_PATH)/$$dir/${Foo}  ; \
 		cp -a ${Foo}/$$dir/* ${INSTALL_PATH}/$${dir}/${Foo} ;       \

@@ -1,8 +1,4 @@
-
-        Copyright (C) 2024, loraline inc, all rights reserved
-
-# If you want to use GPL v2 or later for the /debian/* files use 
-# the following clauses, or change it to suit. Delete these two lines
-Files: /debian/*
-License: LGPL-2
-
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Files: debin/*
+Copyright: 2024 Bill Rees <uberfoot@yahoo.com>
+License: LGPL-3.0

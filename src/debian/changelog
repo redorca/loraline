@@ -1,5 +1,5 @@
-loraline-netmanage (1.1-1) phoo; urgency=medium
+loraline-netmanage (1.1-1) UNRELEASED; urgency=medium
 
-  * Initial release <closes #825501>
+  * Initial release
 
  -- Bill  <uberfoot@yahoo.com>  Mon, 02 Sep 2024 17:28:31 -0700

@@ -12,3 +12,4 @@
 !network.py
 !etc/loraline/creds
 !debian/compat
+!package/
