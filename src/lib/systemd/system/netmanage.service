@@ -21,8 +21,8 @@ Requires=loraline-netmanage.socket
 
 [Service]
 Environmoent= PYTHONPATH=/usr/lib/loraline-netmanage
-ExecStart=/usr/bin/python3 /usr/lib/loraline-netmanage/main.py
-ExecStart=/usr/bin/python3 /usr/lib/loraline-netmanage/main.py
+ExecStart=/usr/bin/python3 /usr/lib/python3/dist-packages/loraline-netmanage/main.py
+ExecStart=/usr/bin/python3 /usr/lib/python3/dist-packages/loraline-netmanage/main.py
 # NotifyAccess=main
 
 [Install]
