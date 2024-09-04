@@ -20,8 +20,9 @@ Description=Lora network management tools
 Requires=loraline-netmanage.socket
 
 [Service]
-ExecStart=/usr/bin/python3 /usr/bin/netmanage.py
-ExecReload=/usr/bin/python3 /usr/bin/netmanage.py
+Environmoent= PYTHONPATH=/usr/lib/loraline-netmanage
+ExecStart=/usr/bin/python3 /usr/lib/loraline-netmanage/main.py
+ExecStart=/usr/bin/python3 /usr/lib/loraline-netmanage/main.py
 # NotifyAccess=main
 
 [Install]

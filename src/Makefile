@@ -14,7 +14,7 @@ PKG_VER = 1.1-1
 #
 # DESTDIR?=debian/$(PACKAGE)
 DESTDIR ?= $(PACKAGE)
-
+UNIT_FILES_PATH = lib/systemd/system
 INSTALL_PATH = $(DESTDIR)$(TARGETDIR)
 Q=@
 RM = rm -f
@@ -41,6 +41,8 @@ package: $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE)
 	$(Q) $(CP) *.py $(DESTDIR)/opt/${PACKAGE}
 	$(Q) $(CP) debian/ $(DESTDIR)
 	$(Q) $(CP) debian/Makefile $(DESTDIR)
+	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.service $(DESTDIR)/debian/loraline-netmanage.service
+	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.socket $(DESTDIR)/debian/loraline-netmanage.socket 
 
 fixup:
 	$(Q) find $(DESTDIR) -name .gitignore -exec $(RM) {} \;
@@ -58,6 +60,7 @@ $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE):
 
 clean:
 	$(Q) $(RM) $(PACKAGE)_$(PKG_VER).* $(PACKAGE)_$(PKG_VER)_*
+	# $(Q) $(RM) debian/*.service debian/*.socket
 	$(Q) $(RM) data.tar.*  control.tar.* debian-binary
 	$(Q) [ ! -d $(DESTDIR)/debian ] || (cd ${DESTDIR%debian*}debian/ && $(RM) -r debhelper-build-stamp *.substvars .debhelper)
 
