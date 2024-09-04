@@ -13,3 +13,4 @@
 !etc/loraline/creds
 !debian/compat
 !package/
+!dobuild
