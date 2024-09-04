@@ -1,8 +1,8 @@
 #!/bin/bash
 
-OVERLAY=newracom_overlay.dtb
-CONF_FILE=/boot/config.txt
 
-if grep ${OVERLAY} ${CONF_FILE} >/dev/null 2>&1 ; then
-        sed -i -e '/'${OVERLAY}'/d' $CONF_FILE
-fi
+# simple :: prerm remove
+# old-prerm upgrade new-version
+# conflictor's-prerm remove in-favour package new-version
+# deconfigured's-prerm deconfigure in-favour package-being-installed version [removing conflicting-package version]
+

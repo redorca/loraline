@@ -1,8 +1,8 @@
 #!/bin/bash
 
-OVERLAY=newracom_overlay.dtb
-CONF_FILE=/boot/config.txt
-
-if ! grep ${OVERLAY} "${CONF_FILE}" >/dev/null 2>&1 ; then
-        echo "${OVERLAY}" >> "${CONF_FILE}"
-fi
+# Possible args
+#    current run (no problems) ::  configure most-recently-configured-version
+#    postinst :: abort remove
+#    prev version :: abort-upgrade new-version
+#    conflictor's-postinst :: abort-remove in-favour package new-version
+#    deconfigured's-postinst :: abort-deconfigure in-favour failed-install-package version [ removing conflicting-package version ]
