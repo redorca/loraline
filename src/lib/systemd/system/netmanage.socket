@@ -19,7 +19,7 @@
 Description=netmange listen socket address and port
 
 [Socket]
-ListenStream=127.0.0.1:1515
+ListenStream=1515
 
 [Install]
 WantedBy=sockets.target
