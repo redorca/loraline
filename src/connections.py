@@ -67,13 +67,6 @@ class Connection():
         self.state = 'open'
         return self.connection
 
-    async def debug_on(self, level):
-        '''
-        '''
-        logging.basicConfig()
-        asyncssh.set_log_level('DEBUG')
-        asyncssh.set_debug_level(level)
-
     async def issue(self, cmd):
         '''
             run a command on the host of this channel and return the results in string form.

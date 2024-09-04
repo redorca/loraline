@@ -9,7 +9,7 @@ class DasLog():
     '''
         Framework for establishing a logging componnent
     '''
-    def __init__(self, handler="syslog"):
+    def __init__(self, level="info", handler="syslog"):
         '''
             Setup a logger with the syslog handler and useful formatting so upon
             return the class instance is a fully functional logger
@@ -30,7 +30,7 @@ class DasLog():
         self.map_to_level['critical'] = logging.CRITICAL
 
         self.log = logging.getLogger(__name__)
-        self.log.setLevel(logging.INFO)
+        self.log.setLevel(level)
         self.log.addHandler(sysHandle)
 
         return
@@ -53,8 +53,16 @@ class DasLog():
     def critical(self, msg):
         self.log.critical(msg)
 
-    def get_level(self):
+    def get_level_name(self):
         return logging.getLevelName(self.log.getEffectiveLevel())
+
+    @property
+    def level(self):
+        return log.getEffectiveLevel()
+
+    @level.setter
+    def level(self, level):
+        self.log.setLevel(level)
 
     def msg(self, level, msg):
         self.map_to_level[level](msg)
