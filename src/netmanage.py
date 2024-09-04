@@ -15,6 +15,7 @@ from cmds   import commands
 import socket
 import asyncio
 import sys
+import os
 
 blog = logg.DasLog('netmanage')
 
@@ -54,12 +55,26 @@ async def main():
     # except KeyError as keye:
         # print(f'{keye}')
 
-    cmd_string = ' '.join(sys.argv[1:])
+    protocol = "ssh"
+    user = os.getenv("TARGET_USER")
+    pword = os.getenv("TARGET_PASS")
+    if user is None or pword is None:
+        print(' user or password, or both, are invalid.')
+        print(' Please set TARGET_USER to desired user,')
+        print(' and TARGET_PASS to the password.')
+        exit(1)
     # print(f'cmd string:: {cmd_string}')
     # host, port = await initialize.get_params(connect_type)
     params = await initialize.get_params(connect_type)
     host = params["daemon"]["Host"]
     port = params["daemon"]["Port"]
+    uri = await initialize.build_uri(host, port, protocol, user, pword)
+
+    cmd_string = ' '.join(sys.argv[1:])
+    if sys.argv[1] == "creds":
+        print(f' send creds to service: {uri}')
+        cmd_string = ' '.join([sys.argv[1:], uri])
+
     try:
         client(host, port, bytes(cmd_string.encode('UTF8')))
     except ConnectionRefusedError as cre:
