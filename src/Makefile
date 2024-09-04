@@ -16,6 +16,7 @@ PKG_VER = 1.1-1
 DESTDIR ?= $(PACKAGE)
 UNIT_FILES_PATH = lib/systemd/system
 INSTALL_PATH = $(DESTDIR)$(TARGETDIR)
+DISTPKGS_DIR = $(DESTDIR)/lib/python3/dist-packages/$(PACKAGE)
 Q=@
 RM = rm -f
 RMR = $(RM) -r
@@ -35,10 +36,10 @@ install: package fixup
 	@echo "===================================="
 
 package: Foo=$(PACKAGE:gcc-%=%)
-package: $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE)
+package: $(DESTDIR)$(TARGETDIR) $(DISTPKGS_DIR)
 	$(Q) $(CP) etc/ $(DESTDIR)
-	$(Q) $(CP) ../loglady cmds/ $(DESTDIR)/opt/${PACKAGE}
-	$(Q) $(CP) *.py $(DESTDIR)/opt/${PACKAGE}
+	$(Q) $(CP) ../loglady cmds/  $(DISTPKGS_DIR)
+	$(Q) $(CP) *.py  $(DISTPKGS_DIR)
 	$(Q) $(CP) debian/ $(DESTDIR)
 	$(Q) $(CP) debian/Makefile $(DESTDIR)
 	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.service $(DESTDIR)/debian/loraline-netmanage.service
@@ -52,7 +53,7 @@ doc-fix:
 		gzip $$pdf  ; \
 	     done
 
-$(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE):
+$(DESTDIR)$(TARGETDIR) $(DISTPKGS_DIR):
 	$(Q) [ -d $@ ] || $(MKDIR) $@
 
 
