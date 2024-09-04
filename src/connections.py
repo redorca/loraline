@@ -76,7 +76,7 @@ class Connection():
 
     async def issue(self, cmd):
         '''
-            run a command on the host of this channel and return the results in string form. 
+            run a command on the host of this channel and return the results in string form.
             open a unique channel on the connection. Expect it to be unique across multiple
             calls so that parallel actions may be supported.
         '''

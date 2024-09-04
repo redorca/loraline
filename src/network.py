@@ -17,7 +17,7 @@ class Network():
     def __init__(self, node_file):
         self.parse = parse.ConfigParser(allow_no_value=True)
         # self.data_set = self.parse.read(node_file)
-        self.nodes = list() 
+        self.nodes = list()
         self.node_file = node_file
         self.network = dict()
 
