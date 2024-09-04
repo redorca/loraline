@@ -10,8 +10,8 @@ Homepage:
 
 Package: loraline-netmanage
 Architecture: any
-Depends: python3
-Breaks: loraline-netmanage
+Depends: python3-asyncssh (>= 2.10.1-2) ${shlibs:Depends}, ${misc:Depends},
+Breaks: loraline-netmanage (>= 1.1-1)
 Description: Manage access to a loraline network and monitoring of the network.
  The application runs as two parts; one a background service, the other
  a command line interface.
