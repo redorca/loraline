@@ -17,13 +17,15 @@
 
 [Unit]
 Description=Lora network management tools
-Requires=loraline-netmanage.socket
 
 [Service]
-Environmoent= PYTHONPATH=/usr/lib/loraline-netmanage
 ExecStart=/usr/bin/python3 /usr/lib/python3/dist-packages/loraline-netmanage/main.py
-ExecStart=/usr/bin/python3 /usr/lib/python3/dist-packages/loraline-netmanage/main.py
-# NotifyAccess=main
+ExecReload=/usr/bin/python3 /usr/lib/python3/dist-packages/loraline-netmanage/main.py
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+
 
 [Install]
-Also=loraline-netmanage.socket
+WantedBy=multi-user.target
