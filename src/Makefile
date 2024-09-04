@@ -29,7 +29,7 @@ changelog:
 	$(Q) echo "$(PACKAGE) ($(PKG_VER)) UNRELEASED; urgency=medium" > fupu
 	$(Q) echo "\n\n * Initial release\n" >> fupu
 	$(Q) echo "\t-- bill <bill@zglue.com>  Sat, 04 May 2019 23:28:32 -0700" >> fupu
- 
+
 
 install: package fixup
 	@echo "===================================="
@@ -42,7 +42,7 @@ package: $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE)
 	$(Q) $(CP) debian/ $(DESTDIR)
 	$(Q) $(CP) debian/Makefile $(DESTDIR)
 	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.service $(DESTDIR)/debian/loraline-netmanage.service
-	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.socket $(DESTDIR)/debian/loraline-netmanage.socket 
+	$(Q) $(CP) $(UNIT_FILES_PATH)/netmanage.socket $(DESTDIR)/debian/loraline-netmanage.socket
 
 fixup:
 	$(Q) find $(DESTDIR) -name .gitignore -exec $(RM) {} \;
@@ -51,8 +51,6 @@ doc-fix:
 	$(Q) for pdf in $$(find $(INSTALL_PATH)/share/doc -name "*.pdf") ; do   \
 		gzip $$pdf  ; \
 	     done
-	$(Q) 
-	$(Q) 
 
 $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE):
 	$(Q) [ -d $@ ] || $(MKDIR) $@
