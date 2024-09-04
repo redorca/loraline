@@ -57,10 +57,11 @@ $(DESTDIR)$(TARGETDIR) $(DESTDIR)/opt/$(PACKAGE):
 
 
 clean:
-	$(Q) $(RMR) $(DESTDIR)
 	$(Q) $(RM) $(PACKAGE)_$(PKG_VER).* $(PACKAGE)_$(PKG_VER)_*
+	$(Q) $(RM) data.tar.*  control.tar.* debian-binary
+	$(Q) [ ! -d $(DESTDIR)/debian ] || (cd ${DESTDIR%debian*}debian/ && $(RM) -r debhelper-build-stamp *.substvars .debhelper)
 
 clobber: clean
-	$(Q) cd ${DESTDIR%debian*}debian/ && $(RM) -r debhelper-build-stamp gcc-arm-none-eabi.substvars files .debhelper
+	$(Q) $(RMR) $(DESTDIR)
 
 
