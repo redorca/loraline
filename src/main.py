@@ -23,9 +23,11 @@ async def do_setup(StreamReader, StreamWriter):
         Wait for input in preparation for queueing a command that
         a command pipe will process.
     '''
-    data = await StreamReader.read(300)
+    data = await StreamReader.read(80)
+    print(f'== 0 data \"{data.decode("UTF8")\"}')
     try:
         pack = json.loads(data.decode('UTF8'))
+        print(f'=== 1')
         logging.warning("Decoded json")
     except json.JSONDecodeError as jde:
         logging.warning(jde)
@@ -34,6 +36,8 @@ async def do_setup(StreamReader, StreamWriter):
         TARGET_USER = pack["TARGET_USER"]
     if "TARGET_PASS" in pack:
         TARGET_PASS = pack["TARGET_PASS"]
+    print(f'=== 9 TARGET_USER {TARGET_USER}, TARGET_PASS {TARGEWT_PASS}')
+    if TARGET_USER != "" and TARGET_PASS != "":
         raise ConnectionRefusedError 
 
 async def do_cmd(StreamReader, StreamWriter):
