@@ -3,12 +3,36 @@
     dictated by the user.
 '''
 '''
+# import argparse
+# import json
+#
+# cli = argparse.ArgumentParser()
+# cli.add_argument('--one', default="")
+# cli.add_argument('--two', default="")
+# cli.add_argument("cmd", nargs=argparse.REMAINDER)
+#
+# cmds = ''
+# goo = ''
+# foof = cli.parse_args()
+# if len(foof.one) + len(foof.two) == 0:
+#     if len(foof.cmd) != 0:
+#         cmds = ' '.join(foof.cmd)
+#         stuff = { "action": "lora", "cmds": cmds }
+#         goo = json.dumps(stuff)
+# elif len(foof.one) * len(foof.two) == 0:
+#     print("You need to specify the user name and the password as arguments, not one or the other")
+# else:
+#     stuff = { "action": "setup", "TARGET_USER": foof.one, "TARGET_PASS": foof.two }
+#     goo = json.dumps(stuff)
+#
+# print(f'   Packet:: >>{goo}<<')
 '''
 '''
 '''
 '''
 '''
 
+import argparse
 import initialize
 from cmds   import commands
 import socket
@@ -40,6 +64,11 @@ def client(host, port, cmd):
 async def main():
     '''
     '''
+    setup = argparse.ArgumentParser()
+    setup.add_argument('--user')
+    setup.add_argument('--pass')
+    setup.add_argument('cmd', argparse.REMAINDER)
+    stuff = setup.parse_args()
     # connect_type = 'remote'
     connect_type = 'local'
 
